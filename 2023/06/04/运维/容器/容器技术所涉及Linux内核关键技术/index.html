@@ -141,6 +141,61 @@
 								<li class="directory">
 									<a href="#" class="directory">
 										<i class="fa fa-plus-square-o"></i>
+										数据库
+									</a>
+									
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
+										mysql
+									</a>
+									
+							<ul>
+								<li class="file">
+									<a href="../../../%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/MYSQL%20performance%20schema%E8%AF%A6%E8%A7%A3/">
+                     
+										    MYSQL performance schema详解
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="../../../../../05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/">
+                     
+										    mysql执行计划
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="../../../../05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">
+                     
+										    mysql的锁机制
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+								</li>
+								
+							</ul>
+			
+							<ul>
+								<li class="directory">
+									<a href="#" class="directory">
+										<i class="fa fa-plus-square-o"></i>
 										运维
 									</a>
 									
@@ -338,117 +393,57 @@
 <p><img src="/2023/06/04/%E8%BF%90%E7%BB%B4/%E5%AE%B9%E5%99%A8/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E6%89%80%E6%B6%89%E5%8F%8ALinux%E5%86%85%E6%A0%B8%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF//image-20220111132707215.png" alt="image-20220111132707215"></p>
 <h3 id="2-3-1-创建net命名空间"><a href="#2-3-1-创建net命名空间" class="headerlink" title="2.3.1 创建net命名空间"></a>2.3.1 创建net命名空间</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">创建名称为msb的网络命名空间</span><br><span class="line"><span class="comment"># ip netns add msb</span></span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">查看已创建的网络命名空间</span><br><span class="line"><span class="comment"># ip netns ls</span></span><br><span class="line">msb</span><br></pre></td></tr></table></figure>
-
-
-
-
 
 <h3 id="2-3-2-删除net命名空间"><a href="#2-3-2-删除net命名空间" class="headerlink" title="2.3.2 删除net命名空间"></a>2.3.2 删除net命名空间</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">删除已创建的网络命名空间</span><br><span class="line"><span class="comment"># ip netns delete msb</span></span><br></pre></td></tr></table></figure>
 
-
-
 <h3 id="2-3-3-在net命名空间中执行命令"><a href="#2-3-3-在net命名空间中执行命令" class="headerlink" title="2.3.3 在net命名空间中执行命令"></a>2.3.3 在net命名空间中执行命令</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在网络命名空间中执行bash命令，如果想退出，需要使用<span class="keyword">exit</span></span><br><span class="line"><span class="comment"># ip netns exec msb bash</span></span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="2-3-4-在net命令空间中执行查看网络连接-网卡-命令"><a href="#2-3-4-在net命令空间中执行查看网络连接-网卡-命令" class="headerlink" title="2.3.4 在net命令空间中执行查看网络连接(网卡)命令"></a>2.3.4 在net命令空间中执行查看网络连接(网卡)命令</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在网络命名空间中查看网络命名空间中的网卡信息</span><br><span class="line"><span class="comment"># ip link</span></span><br><span class="line"><span class="number">1</span>: lo: &lt;LOOPBACK&gt; mtu <span class="number">65536</span> qdisc noop state DOWN mode DEFAULT <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/loopback <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> brd <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
 
-
-
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在Linux主机系统中查看</span><br><span class="line"><span class="comment"># ip netns exec msb ip link list</span></span><br><span class="line"><span class="number">1</span>: lo: &lt;LOOPBACK&gt; mtu <span class="number">65536</span> qdisc noop state DOWN mode DEFAULT <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/loopback <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> brd <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
-
-
-
-
 
 <h3 id="2-3-5-退出当前的net命名空间"><a href="#2-3-5-退出当前的net命名空间" class="headerlink" title="2.3.5 退出当前的net命名空间"></a>2.3.5 退出当前的net命名空间</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">退出已进入的网络命名空间</span><br><span class="line"><span class="comment"># exit</span></span><br><span class="line"><span class="keyword">exit</span></span><br></pre></td></tr></table></figure>
 
-
-
 <h3 id="2-3-6-在net命名空间中执行多条命令"><a href="#2-3-6-在net命名空间中执行多条命令" class="headerlink" title="2.3.6 在net命名空间中执行多条命令"></a>2.3.6 在net命名空间中执行多条命令</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在网络命名空间中查看路由表</span><br><span class="line"><span class="comment"># route -n</span></span><br><span class="line">Kernel IP routing table</span><br><span class="line">Destination     Gateway         Genmask         Flags Metric Ref    Use Iface</span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">在网络命名空间中查看防火墙规则</span><br><span class="line"><span class="comment"># iptables -t nat -nL</span></span><br><span class="line">Chain PREROUTING (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line"></span><br><span class="line">Chain INPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line"></span><br><span class="line">Chain OUTPUT (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination         </span><br><span class="line"></span><br><span class="line">Chain POSTROUTING (policy ACCEPT)</span><br><span class="line">target     prot opt source               destination</span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="2-3-7-创建虚拟网卡"><a href="#2-3-7-创建虚拟网卡" class="headerlink" title="2.3.7 创建虚拟网卡"></a>2.3.7 创建虚拟网卡</h3><blockquote>
 <p>同时创建一对虚拟网卡</p>
 </blockquote>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">创建虚拟网卡对</span><br><span class="line"><span class="comment"># ip link add veth0 type veth peer name veth1</span></span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">在物理机上查看</span><br><span class="line"><span class="comment"># ip a s</span></span><br><span class="line">......</span><br><span class="line"><span class="number">10</span>: veth1@veth0: &lt;BROADCAST,MULTICAST,M<span class="literal">-DOWN</span>&gt; mtu <span class="number">1500</span> qdisc noop state DOWN <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/ether de:<span class="number">44</span>:f8:b7:<span class="number">12</span>:<span class="number">65</span> brd ff:ff:ff:ff:ff:ff</span><br><span class="line"><span class="number">11</span>: veth0@veth1: &lt;BROADCAST,MULTICAST,M<span class="literal">-DOWN</span>&gt; mtu <span class="number">1500</span> qdisc noop state DOWN <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/ether <span class="number">46</span>:<span class="number">5</span>e:<span class="number">89</span>:<span class="number">8</span>c:cb:b3 brd ff:ff:ff:ff:ff:ff</span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="2-3-8-迁移虚拟网卡到命名空间中"><a href="#2-3-8-迁移虚拟网卡到命名空间中" class="headerlink" title="2.3.8 迁移虚拟网卡到命名空间中"></a>2.3.8 迁移虚拟网卡到命名空间中</h3><blockquote>
 <p>这两个网卡还都属于“default”或“global”命名空间，和物理网卡一样。把其中一个网卡转移到命名空间msb中。</p>
 </blockquote>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">把创建的veth1网卡添加到msb网络命名空间中</span><br><span class="line"><span class="comment"># ip link set veth1 netns msb</span></span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在Linux系统命令行查看网络命名空间中的网络</span><br><span class="line"><span class="comment"># ip netns exec msb ip link</span></span><br><span class="line"><span class="number">1</span>: lo: &lt;LOOPBACK&gt; mtu <span class="number">65536</span> qdisc noop state DOWN mode DEFAULT <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/loopback <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> brd <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br><span class="line"><span class="number">10</span>: veth1@if11: &lt;BROADCAST,MULTICAST&gt; mtu <span class="number">1500</span> qdisc noop state DOWN mode DEFAULT <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/ether de:<span class="number">44</span>:f8:b7:<span class="number">12</span>:<span class="number">65</span> brd ff:ff:ff:ff:ff:ff link<span class="literal">-netnsid</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="2-3-9-命名空间中迁出虚拟网卡"><a href="#2-3-9-命名空间中迁出虚拟网卡" class="headerlink" title="2.3.9 命名空间中迁出虚拟网卡"></a>2.3.9 命名空间中迁出虚拟网卡</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">在Linux系统命令行把虚拟网卡veth1从网络命名空间删除</span><br><span class="line"><span class="comment"># ip netns exec msb ip link delete veth1</span></span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在Linux系统命令行查看结果</span><br><span class="line"><span class="comment"># ip netns exec msb ip link</span></span><br><span class="line"><span class="number">1</span>: lo: &lt;LOOPBACK&gt; mtu <span class="number">65536</span> qdisc noop state DOWN mode DEFAULT <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/loopback <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> brd <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
-
-
 
 <h3 id="2-3-10-配置虚拟网卡IP地址"><a href="#2-3-10-配置虚拟网卡IP地址" class="headerlink" title="2.3.10 配置虚拟网卡IP地址"></a>2.3.10 配置虚拟网卡IP地址</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">再次创建虚拟网卡，添加到msb网络命名空间，并设置IP地址</span><br><span class="line"><span class="comment"># ip link add veth0 type veth peer name veth1</span></span><br><span class="line"><span class="comment"># ip link set veth1 netns msb</span></span><br><span class="line"><span class="comment"># ip netns exec msb ip addr add 192.168.50.2/24 dev veth1</span></span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">在Linux系统命令行查看网络状态</span><br><span class="line"><span class="comment"># ip netns exec msb ip addr</span></span><br><span class="line"><span class="number">1</span>: lo: &lt;LOOPBACK&gt; mtu <span class="number">65536</span> qdisc noop state DOWN <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/loopback <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> brd <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br><span class="line"><span class="number">12</span>: veth1@if13: &lt;BROADCAST,MULTICAST&gt; mtu <span class="number">1500</span> qdisc noop state DOWN <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/ether fe:<span class="number">20</span>:<span class="built_in">ac</span>:a8:<span class="number">13</span>:<span class="number">4</span>c brd ff:ff:ff:ff:ff:ff link<span class="literal">-netnsid</span> <span class="number">0</span></span><br><span class="line">    inet <span class="number">192.168</span>.<span class="number">50.2</span>/<span class="number">24</span> scope global veth1</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
-
-
 
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">启动虚拟网卡,veth1与lo全部要启动</span><br><span class="line"><span class="comment"># ip netns exec msb ip link set veth1 up</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ip netns exec msb ip link set lo up</span></span><br></pre></td></tr></table></figure>
 
-
-
-
-
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">为物理机veth0添加IP地址</span><br><span class="line"></span><br><span class="line"><span class="comment"># ip a s</span></span><br><span class="line">......</span><br><span class="line"><span class="number">15</span>: veth0@if14: &lt;BROADCAST,MULTICAST&gt; mtu <span class="number">1500</span> qdisc noop state DOWN <span class="built_in">group</span> defau</span><br><span class="line">lt qlen <span class="number">1000</span></span><br><span class="line">    link/ether <span class="number">2</span>e:b4:<span class="number">40</span>:c8:<span class="number">73</span>:dc brd ff:ff:ff:ff:ff:ff link<span class="literal">-netnsid</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
-
-
 
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ip addr add 192.168.50.3/24 dev veth0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ip a s veth0</span></span><br><span class="line"><span class="number">15</span>: veth0@if14: &lt;BROADCAST,MULTICAST&gt; mtu <span class="number">1500</span> qdisc noop state DOWN <span class="built_in">group</span> default qlen <span class="number">1000</span></span><br><span class="line">    link/ether <span class="number">2</span>e:b4:<span class="number">40</span>:c8:<span class="number">73</span>:dc brd ff:ff:ff:ff:ff:ff link<span class="literal">-netnsid</span> <span class="number">0</span></span><br><span class="line">    inet <span class="number">192.168</span>.<span class="number">50.3</span>/<span class="number">24</span> scope global veth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ip link set veth0 up</span></span><br></pre></td></tr></table></figure>
-
-
 
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在宿主机上ping msb中的veth1</span><br><span class="line"><span class="comment"># ping 192.168.50.2</span></span><br><span class="line">PING <span class="number">192.168</span>.<span class="number">50.2</span> (<span class="number">192.168</span>.<span class="number">50.2</span>) <span class="number">56</span>(<span class="number">84</span>) bytes of <span class="keyword">data</span>.</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.2</span>: icmp_seq=<span class="number">1</span> ttl=<span class="number">64</span> time=<span class="number">0.102</span> ms</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.2</span>: icmp_seq=<span class="number">2</span> ttl=<span class="number">64</span> time=<span class="number">0.068</span> ms</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.2</span>: icmp_seq=<span class="number">3</span> ttl=<span class="number">64</span> time=<span class="number">0.068</span> ms</span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">在msb中的veth1 ping 宿主机上veth0</span><br><span class="line"><span class="comment"># ip netns exec msb ping 192.168.50.3</span></span><br><span class="line">PING <span class="number">192.168</span>.<span class="number">50.3</span> (<span class="number">192.168</span>.<span class="number">50.3</span>) <span class="number">56</span>(<span class="number">84</span>) bytes of <span class="keyword">data</span>.</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.3</span>: icmp_seq=<span class="number">1</span> ttl=<span class="number">64</span> time=<span class="number">0.053</span> ms</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.3</span>: icmp_seq=<span class="number">2</span> ttl=<span class="number">64</span> time=<span class="number">0.031</span> ms</span><br><span class="line"><span class="number">64</span> bytes from <span class="number">192.168</span>.<span class="number">50.3</span>: icmp_seq=<span class="number">3</span> ttl=<span class="number">64</span> time=<span class="number">0.029</span> ms</span><br></pre></td></tr></table></figure>
 
-
-
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如果需要访问本机的其它网段，可手动添加如下默认路由条目。</span><br><span class="line"><span class="comment"># ip netns exec msb ip route add default via 192.168.50.3</span></span><br></pre></td></tr></table></figure>
-
-
-
-
 
 <blockquote>
 <p>关于如何ping通外网主机，可设置路由转发完成。</p>
@@ -466,35 +461,20 @@
 <li>资源统计（Accounting）： cgroups 可以统计系统的资源使用量，如 CPU 使用时长、内存用量等等，这个功能非常适用于计费。</li>
 <li>进程控制（Control）：cgroups 可以对进程组执行挂起、恢复等操作。</li>
 </ul>
-<h2 id="3-3-CGroups应用案例"><a href="#3-3-CGroups应用案例" class="headerlink" title="3.3 CGroups应用案例"></a>3.3 CGroups应用案例</h2><h3 id="3-3-1-安装及开启服务"><a href="#3-3-1-安装及开启服务" class="headerlink" title="3.3.1 安装及开启服务"></a>3.3.1 安装及开启服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# yum -y install libcgroup</span><br><span class="line">[root@localhost ~]# systemctl start cgconfig.service 	</span><br><span class="line">[root@localhost ~]# systemctl enable cgconfig.service</span><br></pre></td></tr></table></figure>
-
-
+<h2 id="3-3-CGroups应用案例"><a href="#3-3-CGroups应用案例" class="headerlink" title="3.3 CGroups应用案例"></a>3.3 CGroups应用案例</h2><h3 id="3-3-1-安装及开启服务"><a href="#3-3-1-安装及开启服务" class="headerlink" title="3.3.1 安装及开启服务"></a>3.3.1 安装及开启服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# yum -y install libcgroup</span><br><span class="line">[root@localhost ~]# systemctl start cgconfig.service     </span><br><span class="line">[root@localhost ~]# systemctl enable cgconfig.service</span><br></pre></td></tr></table></figure>
 
 <h3 id="3-3-2-限制进程使用CPU"><a href="#3-3-2-限制进程使用CPU" class="headerlink" title="3.3.2 限制进程使用CPU"></a>3.3.2 限制进程使用CPU</h3><h4 id="3-3-2-1-查看cpu-shares"><a href="#3-3-2-1-查看cpu-shares" class="headerlink" title="3.3.2.1 查看cpu shares"></a>3.3.2.1 查看cpu shares</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">查看资源限制子系统</span><br><span class="line">[<span class="type">root</span>@<span class="type">localhost</span> ~]<span class="comment"># lssubsys</span></span><br><span class="line">cpuset</span><br><span class="line">cpu,cpuacct</span><br><span class="line">memory</span><br><span class="line">devices</span><br><span class="line">freezer</span><br><span class="line">net_cls,net_prio</span><br><span class="line">blkio</span><br><span class="line">perf_event</span><br><span class="line">hugetlb</span><br><span class="line">pids</span><br><span class="line"></span><br><span class="line">查看子系统配置文件所在位置</span><br><span class="line">[<span class="type">root</span>@<span class="type">localhost</span> ~]<span class="comment"># ls /sys/fs/cgroup/</span></span><br><span class="line">blkio  cpuacct      cpuset   freezer  memory   net_cls,net_prio  perf_event  systemd</span><br><span class="line">cpu    cpu,cpuacct  devices  hugetlb  net_cls  net_prio          pids</span><br><span class="line">[<span class="type">root</span>@<span class="type">localhost</span> ~]<span class="comment"># ls /sys/fs/cgroup/cpu</span></span><br><span class="line">cgroup.clone_children  cpuacct.stat          cpu.cfs_quota_us   cpu.stat</span><br><span class="line">cgroup.event_control   cpuacct.usage         cpu.rt_period_us   notify_on_release</span><br><span class="line">cgroup.procs           cpuacct.usage_percpu  cpu.rt_runtime_us  release_agent</span><br><span class="line">cgroup.sane_behavior   cpu.cfs_period_us     cpu.shares         tasks</span><br><span class="line"></span><br><span class="line">查看CPU时间分片，用于保证分组所得到的CPU分片总量。</span><br><span class="line">[<span class="type">root</span>@<span class="type">localhost</span> ~]<span class="comment"># cat /sys/fs/cgroup/cpu/cpu.shares</span></span><br><span class="line"><span class="number">1024</span></span><br></pre></td></tr></table></figure>
 
-
-
-
-
-<h4 id="3-3-2-2-使用CPU子系统创建2个group分组"><a href="#3-3-2-2-使用CPU子系统创建2个group分组" class="headerlink" title="3.3.2.2 使用CPU子系统创建2个group分组"></a>3.3.2.2 使用CPU子系统创建2个group分组</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vim /etc/cgconfig.conf</span><br><span class="line">group lesscpu &#123;</span><br><span class="line">	cpu&#123;</span><br><span class="line">		cpu.shares=200;</span><br><span class="line">	&#125;	</span><br><span class="line">&#125;</span><br><span class="line">group morecpu &#123;</span><br><span class="line">	cpu&#123;</span><br><span class="line">		cpu.shares=800;</span><br><span class="line">	&#125;	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# systemctl restart cgconfig</span><br></pre></td></tr></table></figure>
+<h4 id="3-3-2-2-使用CPU子系统创建2个group分组"><a href="#3-3-2-2-使用CPU子系统创建2个group分组" class="headerlink" title="3.3.2.2 使用CPU子系统创建2个group分组"></a>3.3.2.2 使用CPU子系统创建2个group分组</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vim /etc/cgconfig.conf</span><br><span class="line">group lesscpu &#123;</span><br><span class="line">    cpu&#123;</span><br><span class="line">        cpu.shares=200;</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br><span class="line">group morecpu &#123;</span><br><span class="line">    cpu&#123;</span><br><span class="line">        cpu.shares=800;</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# systemctl restart cgconfig</span><br></pre></td></tr></table></figure>
 
 <p>准备一个脚本</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">a=<span class="number">1</span></span><br><span class="line"><span class="keyword">while</span> true</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">        a=<span class="variable">$</span>[<span class="variable">$a</span>+<span class="number">1</span>]</span><br><span class="line">done</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line">a=<span class="number">1</span></span><br><span class="line"><span class="keyword">while</span> true</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">        a=<span class="variable">$</span>[<span class="variable">$a</span>+<span class="number">1</span>]</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
 
 <p>将将要运行的应用程序分配到指定分组(<strong>请使用单CPU机器,三个终端验证</strong>)</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">终端1# cgexec -g cpu:lesscpu sh /tmp/1.sh</span><br><span class="line"></span><br><span class="line">终端2# cgexec -g cpu:morecpu sh /tmp/1.sh</span><br><span class="line"></span><br><span class="line">终端3# top</span><br></pre></td></tr></table></figure>
 
-
-
 <p><strong>PS: 如果主机有多CPU，为了验证效果，可以进行如下操作</strong></p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">lscpu</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">echo</span> 0 &gt; /sys/devices/system/cpu/cpu0/online</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">echo</span> 1 &gt; /sys/devices/system/cpu/cpu1/online</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
 
 </div>
 
@@ -510,6 +490,11 @@
             
         </div>
         <div class="item right">
+            
+              <a href="../../../%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/MYSQL%20performance%20schema%E8%AF%A6%E8%A7%A3/">
+                MYSQL performance schema详解
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
             
         </div>
     </div>
