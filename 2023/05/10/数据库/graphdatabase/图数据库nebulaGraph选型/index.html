@@ -78,7 +78,7 @@
 <p>DGraph 是由前 Google 员工 Manish Rai Jain 离职创业后，在 2016 年推出的图数据库产品，底层数据模型是 RDF[12]，基于 Go 语言编写，存储引擎基于 BadgerDB[13] 改造，使用 RAFT 保证数据读写的强一致性。</p>
 <p>NebulaGraph 是由前 Facebook 员工叶小萌离职创业后，在 2019年 推出的图数据库产品，底层数据模型是属性图，基于 C++ 语言编写，存储引擎基于 RocksDB[14] 改造，使用 RAFT 保证数据读写的强一致性。</p>
 <p>这两个项目的创始人都在互联网公司图数据库领域深耕多年，对图数据库的落地痛点有深刻认识，整体的架构设计也有较多相似之处。在图数据库最终的选型上，我们基于 LDBC-SNB 数据集[15]对 NebulaGraph、DGraph、HugeGraph 进行了深度性能测评，测试详情见文章：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg4OTg0MzY0Mw==&mid=2247492115&idx=1&sn=1fd71049c940f9ee0013782cf6733a14&source=41#wechat_redirect">主流开源分布式图数据库 Benchmark</a>，从测试结果看 NebulaGraph 在数据导入、实时写入及多跳查询方面性能均优于竞品。此外，NebulaGraph 社区活跃，问题响应速度快，所以团队最终选择基于 NebulaGraph 来搭建图数据库平台</p>
-<h2 id="二-nebulagraph架构"><a href="#二-nebulagraph架构" class="headerlink" title="二.nebulagraph架构"></a>二.nebulagraph架构</h2><p><img src="/2023/05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93nebulaGraph%E9%80%89%E5%9E%8B//nebulaGraph%E6%9E%B6%E6%9E%84.png" alt="nebulaGraph架构"></p>
+<h2 id="二-nebulagraph架构"><a href="#二-nebulagraph架构" class="headerlink" title="二.nebulagraph架构"></a>二.nebulagraph架构</h2><p><img src="/2023/05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/graphdatabase/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93nebulaGraph%E9%80%89%E5%9E%8B//nebulaGraph%E6%9E%B6%E6%9E%84.png" alt="nebulaGraph架构"></p>
 <p>一个完整的 NebulaGraph 集群包含三类服务，即 Query Service、Storage Service 和 Meta Service。每类服务都有其各自的可执行二进制文件，既可以部署在同一节点上，也可以部署在不同的节点上。下面是NebulaGraph 架构设计（见图 3）的几个核心点[16][17]。</p>
 <ul>
 <li><strong>Meta Service：</strong> 架构图中右侧为 Meta Service 集群，它采用 Leader&#x2F;Follower 架构。Leader 由集群中所有的 Meta Service 节点选出，然后对外提供服务；Followers 处于待命状态，并从 Leader 复制更新的数据。一旦 Leader 节点 Down 掉，会再选举其中一个 Follower 成为新的 Leader。Meta Service 不仅负责存储和提供图数据的 Meta 信息，如 Schema、数据分片信息等；同时还提供 Job Manager 机制管理长耗时任务，负责指挥数据迁移、Leader 变更、数据 compaction、索引重建等运维操作。</li>
@@ -128,13 +128,17 @@
 			
 		
 	
+		
+			
+			
+			
 	
 	
-		<li class="prev"><a href="../mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+		<li class="prev"><a href="../k8s%E9%83%A8%E7%BD%B2nebulaGraph/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
 	
 	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
 	
-		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+		<li class="next"><a href="../../mysql/mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
 	
 </ul>
 </div>
