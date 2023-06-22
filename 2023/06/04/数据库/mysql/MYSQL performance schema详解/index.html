@@ -1,275 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE HTML>
+<html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
-	
-	<!-- title -->
-	
-	<title>
-	
-		MYSQL performance schema详解 | 
-	 
-	Hexo
-	</title>
-	
-	<!-- keywords,description -->
-	 
+  <meta charset="utf-8">
+  
+  <title>MYSQL performance schema详解 | Hexo</title>
+  <meta name="author" content="albert dong">
+  
+  <meta name="description" content="MYSQL performance schema详解0、performance_schema的介绍​        MySQL的performance schema 用于监控MySQL server在一个较低级别的运行过程中的资源消耗、资源等待等情况。
+​        特点如下：
+​       ">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-	<!-- favicon -->
-	
-	<link rel="shortcut icon" href="../../../../../../favicon.ico">
-	
+  <meta property="og:title" content="MYSQL performance schema详解"/>
+  <meta property="og:site_name" content="Hexo"/>
 
+  
+    <meta property="og:image" content=""/>
+  
 
-	<!-- search -->
-	<script>
-		var searchEngine = "https://www.google.com/search?q=";
-		if(typeof searchEngine == "undefined" || searchEngine == null || searchEngine == ""){
-			searchEngine = "https://www.google.com/search?q=";
-		}
-		var homeHost = "0914ds.github.io";
-		if(typeof homeHost == "undefined" || homeHost == null || homeHost == ""){
-			homeHost = window.location.host;
-		}
-	</script>
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
+  <script src="/js/jquery-2.0.3.min.js"></script>
 
-	
-<link rel="stylesheet" href="../css/main.css">
-
-	
-<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
-
-	
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.17.1/build/styles/darcula.min.css">
-
-	
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
-
-
-	
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-
-	
-<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
-
-	
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.17.1/build/highlight.min.js"></script>
-
-	
-<script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
-
-	
-<script src="../js/main.js"></script>
-
-
-	
-		
-<script src="https://cdn.jsdelivr.net/npm/leancloud-storage/dist/av-min.js"></script>
-
-		
-<script src="https://cdn.jsdelivr.net/npm/valine@v1.5.1/dist/Valine.min.js"></script>
-
-	
-	
+  <!-- analytics -->
+  
 
 <meta name="generator" content="Hexo 6.3.0"></head>
 
-<body>
-	<header id="header">
-    <a id="title" href="../../../../../../index.html" class="logo">Hexo</a>
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">MYSQL performance schema详解</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2023-06-04</span></h1>
+</div>		
 
-	<ul id="menu">
-    
-      <li class="menu-item">
-        <a href="/about" class="menu-item-link">ABOUT</a>
-      </li>
-    
-
-    
-      <li class="menu-item">
-        <a href="/tags" class="menu-item-link">标签</a>
-      </li>
-    
-
-    
-      <li class="menu-item">
-        <a href="/categories" class="menu-item-link">分类</a>
-      </li>
-    
-
-    
-      
-      
-        <li class="menu-item">
-          <a href='https://github.com' class="menu-item-link" target="_blank">
-            Tree
-          </a>
-        </li>
-      
-        <li class="menu-item">
-          <a href='https://github.com' class="menu-item-link" target="_blank">
-            UidGenerator
-          </a>
-        </li>
-      
-    
+<div class="row page">
+  <!-- cols -->	
   
-    
-      <li class="menu-item">
-        <a href='https://github.com' class="menu-item-link" target="_blank">
-          <i class="fa fa-github fa-2x"></i>
-        </a>
-      </li>
-    
-	</ul>
-</header>
+  
 
-	
-<div id="sidebar">
-	<button id="sidebar-toggle" class="toggle" ><i class="fa fa-arrow-right " aria-hidden="true"></i></button>
-	
-	<div id="site-toc">
-		<input id="search-input" class="search-input" type="search" placeholder="按回车全站搜索">
-		<div id="tree">
-			
+  
+	<div class="col-md-12">
+	  
 
-			
-							<ul>
-								<li class="directory">
-									<a href="#" class="directory">
-										<i class="fa fa-plus-square-o"></i>
-										数据库
-									</a>
-									
-							<ul>
-								<li class="directory">
-									<a href="#" class="directory">
-										<i class="fa fa-plus-square-o"></i>
-										mysql
-									</a>
-									
-							<ul>
-								<li class="file active">
-									<a href="">
-                     
-										    MYSQL performance schema详解
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="../../../../../05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/">
-                     
-										    mysql执行计划
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="../../../../05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">
-                     
-										    mysql的锁机制
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-								</li>
-								
-							</ul>
-			
-								</li>
-								
-							</ul>
-			
-							<ul>
-								<li class="directory">
-									<a href="#" class="directory">
-										<i class="fa fa-plus-square-o"></i>
-										运维
-									</a>
-									
-							<ul>
-								<li class="directory">
-									<a href="#" class="directory">
-										<i class="fa fa-plus-square-o"></i>
-										容器
-									</a>
-									
-							<ul>
-								<li class="file">
-									<a href="../../../%E8%BF%90%E7%BB%B4/%E5%AE%B9%E5%99%A8/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E6%89%80%E6%B6%89%E5%8F%8ALinux%E5%86%85%E6%A0%B8%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF/">
-                     
-										    容器技术所涉及Linux内核关键技术
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="../../../%E8%BF%90%E7%BB%B4/%E5%AE%B9%E5%99%A8/%E5%BA%94%E7%94%A8%EF%BC%88APP%EF%BC%89%E9%83%A8%E7%BD%B2%E5%AE%B9%E5%99%A8%E5%8C%96%E6%BC%94%E8%BF%9B%E4%B9%8B%E8%B7%AF/">
-                     
-										    容器的演进发展
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-								</li>
-								
-							</ul>
-			
-								</li>
-								
-							</ul>
-			
-		</div>
-	</div>
-</div>
-
-	<!-- 引入正文 -->
-	<div id="content">
-		<h1 id="article-title">
-	MYSQL performance schema详解
-</h1>
-
-<!-- meta -->
-<div class="article-meta">
-	
-
-	<span>albert dong</span>
-	<span>2023-06-04 13:13:16</span>
-
-  <div id="article-categories">
-    
-		  <span>Categories：</span>
-      
-    
-
-    
-		    <span>Tags：</span>
-        
-    
-  </div>
-
-</div>
-
-<!-- content -->
-<div id="article-content">
-	<h1 id="MYSQL-performance-schema详解"><a href="#MYSQL-performance-schema详解" class="headerlink" title="MYSQL performance schema详解"></a>MYSQL performance schema详解</h1><h3 id="0、performance-schema的介绍"><a href="#0、performance-schema的介绍" class="headerlink" title="0、performance_schema的介绍"></a>0、performance_schema的介绍</h3><p>​        <strong>MySQL的performance schema 用于监控MySQL server在一个较低级别的运行过程中的资源消耗、资源等待等情况</strong>。</p>
+	  <!-- content -->
+	  <h1 id="MYSQL-performance-schema详解"><a href="#MYSQL-performance-schema详解" class="headerlink" title="MYSQL performance schema详解"></a>MYSQL performance schema详解</h1><h3 id="0、performance-schema的介绍"><a href="#0、performance-schema的介绍" class="headerlink" title="0、performance_schema的介绍"></a>0、performance_schema的介绍</h3><p>​        <strong>MySQL的performance schema 用于监控MySQL server在一个较低级别的运行过程中的资源消耗、资源等待等情况</strong>。</p>
 <p>​        特点如下：</p>
 <p>​        1、提供了一种在数据库运行时实时检查server的内部执行情况的方法。performance_schema 数据库中的表使用performance_schema存储引擎。该数据库主要关注数据库运行过程中的性能相关的数据，与information_schema不同，information_schema主要关注server运行过程中的元数据信息</p>
 <p>​        2、performance_schema通过监视server的事件来实现监视server内部运行情况， “事件”就是server内部活动中所做的任何事情以及对应的时间消耗，利用这些信息来判断server中的相关资源消耗在了哪里？一般来说，事件可以是函数调用、操作系统的等待、SQL语句执行的阶段（如sql语句执行过程中的parsing 或 sorting阶段）或者整个SQL语句与SQL语句集合。事件的采集可以方便的提供server中的相关存储引擎对磁盘文件、表I&#x2F;O、表锁等资源的同步调用信息。<br>​        3、performance_schema中的事件与写入二进制日志中的事件（描述数据修改的events）、事件计划调度程序（这是一种存储程序）的事件不同。performance_schema中的事件记录的是server执行某些活动对某些资源的消耗、耗时、这些活动执行的次数等情况。<br>​        4、performance_schema中的事件只记录在本地server的performance_schema中，其下的这些表中数据发生变化时不会被写入binlog中，也不会通过复制机制被复制到其他server中。<br>​        5、 当前活跃事件、历史事件和事件摘要相关的表中记录的信息。能提供某个事件的执行次数、使用时长。进而可用于分析某个特定线程、特定对象（如mutex或file）相关联的活动。<br>​        6、PERFORMANCE_SCHEMA存储引擎使用server源代码中的“检测点”来实现事件数据的收集。对于performance_schema实现机制本身的代码没有相关的单独线程来检测，这与其他功能（如复制或事件计划程序）不同<br>​        7、收集的事件数据存储在performance_schema数据库的表中。这些表可以使用SELECT语句查询，也可以使用SQL语句更新performance_schema数据库中的表记录（如动态修改performance_schema的setup_*开头的几个配置表，但要注意：配置表的更改会立即生效，这会影响数据收集）<br>​        8、performance_schema的表中的数据不会持久化存储在磁盘中，而是保存在内存中，一旦服务器重启，这些数据会丢失（包括配置表在内的整个performance_schema下的所有数据）<br>​        9、MySQL支持的所有平台中事件监控功能都可用，但不同平台中用于统计事件时间开销的计时器类型可能会有所差异。</p>
@@ -298,64 +89,92 @@
 <p>注意：在performance_schema库中还包含了很多其他的库和表，能对数据库的性能做完整的监控，大家需要参考官网详细了解。</p>
 <h3 id="6、performance-schema实践操作"><a href="#6、performance-schema实践操作" class="headerlink" title="6、performance_schema实践操作"></a>6、performance_schema实践操作</h3><p>​        基本了解了表的相关信息之后，可以通过这些表进行实际的查询操作来进行实际的分析。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--1、哪类的SQL执行最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,COUNT_STAR,FIRST_SEEN,LAST_SEEN <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--2、哪类SQL的平均响应时间最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,AVG_TIMER_WAIT <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--3、哪类SQL排序记录数最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,SUM_SORT_ROWS <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--4、哪类SQL扫描记录数最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,SUM_ROWS_EXAMINED <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--5、哪类SQL使用临时表最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,SUM_CREATED_TMP_TABLES,SUM_CREATED_TMP_DISK_TABLES <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--6、哪类SQL返回结果集最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> DIGEST_TEXT,SUM_ROWS_SENT <span class="keyword">FROM</span> events_statements_summary_by_digest <span class="keyword">ORDER</span> <span class="keyword">BY</span> COUNT_STAR <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--7、哪个表物理IO最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> file_name,event_name,SUM_NUMBER_OF_BYTES_READ,SUM_NUMBER_OF_BYTES_WRITE <span class="keyword">FROM</span> file_summary_by_instance <span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_NUMBER_OF_BYTES_READ <span class="operator">+</span> SUM_NUMBER_OF_BYTES_WRITE <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--8、哪个表逻辑IO最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> object_name,COUNT_READ,COUNT_WRITE,COUNT_FETCH,SUM_TIMER_WAIT <span class="keyword">FROM</span> table_io_waits_summary_by_table <span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_timer_wait <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--9、哪个索引访问最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> OBJECT_NAME,INDEX_NAME,COUNT_FETCH,COUNT_INSERT,COUNT_UPDATE,COUNT_DELETE <span class="keyword">FROM</span> table_io_waits_summary_by_index_usage <span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_TIMER_WAIT <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--10、哪个索引从来没有用过？</span></span><br><span class="line"><span class="keyword">SELECT</span> OBJECT_SCHEMA,OBJECT_NAME,INDEX_NAME <span class="keyword">FROM</span> table_io_waits_summary_by_index_usage <span class="keyword">WHERE</span> INDEX_NAME <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">AND</span> COUNT_STAR <span class="operator">=</span> <span class="number">0</span> <span class="keyword">AND</span> OBJECT_SCHEMA <span class="operator">&lt;&gt;</span> <span class="string">&#x27;mysql&#x27;</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> OBJECT_SCHEMA,OBJECT_NAME;</span><br><span class="line"><span class="comment">--11、哪个等待事件消耗时间最多？</span></span><br><span class="line"><span class="keyword">SELECT</span> EVENT_NAME,COUNT_STAR,SUM_TIMER_WAIT,AVG_TIMER_WAIT <span class="keyword">FROM</span> events_waits_summary_global_by_event_name <span class="keyword">WHERE</span> event_name <span class="operator">!=</span> <span class="string">&#x27;idle&#x27;</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_TIMER_WAIT <span class="keyword">DESC</span></span><br><span class="line"><span class="comment">--12-1、剖析某条SQL的执行情况，包括statement信息，stege信息，wait信息</span></span><br><span class="line"><span class="keyword">SELECT</span> EVENT_ID,sql_text <span class="keyword">FROM</span> events_statements_history <span class="keyword">WHERE</span> sql_text <span class="keyword">LIKE</span> <span class="string">&#x27;%count(*)%&#x27;</span>;</span><br><span class="line"><span class="comment">--12-2、查看每个阶段的时间消耗</span></span><br><span class="line"><span class="keyword">SELECT</span> event_id,EVENT_NAME,SOURCE,TIMER_END <span class="operator">-</span> TIMER_START <span class="keyword">FROM</span> events_stages_history_long <span class="keyword">WHERE</span> NESTING_EVENT_ID <span class="operator">=</span> <span class="number">1553</span>;</span><br><span class="line"><span class="comment">--12-3、查看每个阶段的锁等待情况</span></span><br><span class="line"><span class="keyword">SELECT</span> event_id,event_name,source,timer_wait,object_name,index_name,operation,nesting_event_id <span class="keyword">FROM</span> events_waits_history_longWHERE nesting_event_id <span class="operator">=</span> <span class="number">1553</span>;</span><br></pre></td></tr></table></figure>
+	  
 
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+	
+	
+		<li class="prev"><a href="../../../%E8%BF%90%E7%BB%B4/%E5%AE%B9%E5%99%A8/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E6%89%80%E6%B6%89%E5%8F%8ALinux%E5%86%85%E6%A0%B8%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="../../../../../05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
 </div>
 
-<!-- post-guide -->
-
-    <div class="post-guide">
-        <div class="item left">
-            
-              <a href="../../../%E8%BF%90%E7%BB%B4/%E5%AE%B9%E5%99%A8/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E6%89%80%E6%B6%89%E5%8F%8ALinux%E5%86%85%E6%A0%B8%E5%85%B3%E9%94%AE%E6%8A%80%E6%9C%AF/">
-                  <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  容器技术所涉及Linux内核关键技术
-              </a>
-            
-        </div>
-        <div class="item right">
-            
-              <a href="../../../../../05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/">
-                mysql执行计划
-                <i class="fa fa-angle-right" aria-hidden="true"></i>
-              </a>
-            
-        </div>
-    </div>
-
-
-<!-- comment - giscus -->
-
-
-<!-- comment - valine -->
-
-
-<script>
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
 	
-	
-</script>
+  </div><!-- row -->
+
 	</div>
-	<div id="footer">
-	<p>
-	©<span id="footerYear-start"></span>-<span id="footerYear-end"></span>
-	<a href="/">albert dong</a> 
-	
-	
-	<br>
-	Theme <a href="//github.com/wujun234/hexo-theme-tree" target="_blank">Tree</a>
-	by <a href="//github.com/wujun234" target="_blank">WuJun</a>
-	Powered by <a href="//hexo.io" target="_blank">Hexo</a>
-	</p>
-</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2023 albert dong
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
 
 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
 <script type="text/javascript">
-	document.getElementById('footerYear-start').innerHTML = new Date().getFullYear() + '';
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
 </script>
 
-<script type="text/javascript">
-	document.getElementById('footerYear-end').innerHTML = new Date().getFullYear() + '';
-</script>
 
-	<button id="totop-toggle" class="toggle"><i class="fa fa-angle-double-up" aria-hidden="true"></i></button>
+
+
 </body>
 </html>
