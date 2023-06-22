@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>图数据库nebulaGraph选型 | Hexo</title>
+  <meta name="author" content="albert dong">
+  
+  <meta name="description" content="nebulaGraph 选型一.why nebulaGraph ？在图数据库的选型上我们主要考虑了以下 5 点：(A) 项目开源，暂不考虑需付费的图数据库；(B) 分布式架构设计，具备良好的可扩展性；© 毫秒级的多跳查询延迟；(D) 支持千亿量级点边存储；(E) 具备批量从数仓导入数据的能力。
+分析">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="图数据库nebulaGraph选型"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">图数据库nebulaGraph选型</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2023-05-10</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <h1 id="nebulaGraph-选型"><a href="#nebulaGraph-选型" class="headerlink" title="nebulaGraph 选型"></a>nebulaGraph 选型</h1><h2 id="一-why-nebulaGraph-？"><a href="#一-why-nebulaGraph-？" class="headerlink" title="一.why nebulaGraph ？"></a>一.why nebulaGraph ？</h2><p>在图数据库的选型上我们主要考虑了以下 5 点：(A) 项目开源，暂不考虑需付费的图数据库；(B) 分布式架构设计，具备良好的可扩展性；© 毫秒级的多跳查询延迟；(D) 支持千亿量级点边存储；(E) 具备批量从数仓导入数据的能力。</p>
+<p>分析 DB-Engines[2] 上排名前 30 的图数据库，剔除不开源的项目，我们将剩余的图数据库分为三类：</p>
+<ul>
+<li><strong>第一类：Neo4j[3]、ArangoDB[4]、Virtuoso[5]、TigerGraph[6]、RedisGraph[7]。</strong> 此类图数据库只有单机版本开源可用，性能优秀，但不能应对分布式场景中数据的规模增长，即不满足选型要求（B）、（D）。</li>
+<li><strong>第二类：JanusGraph[8]、HugeGraph[9]。</strong> 此类图数据库在现有存储系统之上新增了通用的图语义解释层，图语义层提供了图遍历的能力，但是受到存储层或者架构限制，不支持完整的计算下推，多跳遍历的性能较差，很难满足 OLTP 场景下对低延时的要求，即不满足选型要求（C）。</li>
+<li><strong>第三类：DGraph[10]、NebulaGraph[11]。</strong> 此类图数据库根据图数据的特点对数据存储模型、点边分布、执行引擎进行了全新设计，对图的多跳遍历进行了深度优化，基本满足我们的选型要求。</li>
+</ul>
+<p>DGraph 是由前 Google 员工 Manish Rai Jain 离职创业后，在 2016 年推出的图数据库产品，底层数据模型是 RDF[12]，基于 Go 语言编写，存储引擎基于 BadgerDB[13] 改造，使用 RAFT 保证数据读写的强一致性。</p>
+<p>NebulaGraph 是由前 Facebook 员工叶小萌离职创业后，在 2019年 推出的图数据库产品，底层数据模型是属性图，基于 C++ 语言编写，存储引擎基于 RocksDB[14] 改造，使用 RAFT 保证数据读写的强一致性。</p>
+<p>这两个项目的创始人都在互联网公司图数据库领域深耕多年，对图数据库的落地痛点有深刻认识，整体的架构设计也有较多相似之处。在图数据库最终的选型上，我们基于 LDBC-SNB 数据集[15]对 NebulaGraph、DGraph、HugeGraph 进行了深度性能测评，测试详情见文章：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg4OTg0MzY0Mw==&mid=2247492115&idx=1&sn=1fd71049c940f9ee0013782cf6733a14&source=41#wechat_redirect">主流开源分布式图数据库 Benchmark</a>，从测试结果看 NebulaGraph 在数据导入、实时写入及多跳查询方面性能均优于竞品。此外，NebulaGraph 社区活跃，问题响应速度快，所以团队最终选择基于 NebulaGraph 来搭建图数据库平台</p>
+<h2 id="二-nebulagraph架构"><a href="#二-nebulagraph架构" class="headerlink" title="二.nebulagraph架构"></a>二.nebulagraph架构</h2><p><img src="/2023/05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93nebulaGraph%E9%80%89%E5%9E%8B//nebulaGraph%E6%9E%B6%E6%9E%84.png" alt="nebulaGraph架构"></p>
+<p>一个完整的 NebulaGraph 集群包含三类服务，即 Query Service、Storage Service 和 Meta Service。每类服务都有其各自的可执行二进制文件，既可以部署在同一节点上，也可以部署在不同的节点上。下面是NebulaGraph 架构设计（见图 3）的几个核心点[16][17]。</p>
+<ul>
+<li><strong>Meta Service：</strong> 架构图中右侧为 Meta Service 集群，它采用 Leader&#x2F;Follower 架构。Leader 由集群中所有的 Meta Service 节点选出，然后对外提供服务；Followers 处于待命状态，并从 Leader 复制更新的数据。一旦 Leader 节点 Down 掉，会再选举其中一个 Follower 成为新的 Leader。Meta Service 不仅负责存储和提供图数据的 Meta 信息，如 Schema、数据分片信息等；同时还提供 Job Manager 机制管理长耗时任务，负责指挥数据迁移、Leader 变更、数据 compaction、索引重建等运维操作。</li>
+<li><strong>存储计算分离：</strong> 在架构图中 Meta Service 的左侧，为 NebulaGraph 的主要服务，NebulaGraph 采用存储与计算分离的架构，虚线以上为计算，以下为存储。存储计算分离有诸多优势，最直接的优势就是，计算层和存储层可以根据各自的情况弹性扩容、缩容。存储计算分离还带来了另一个优势：使水平扩展成为可能。此外，存储计算分离使得 Storage Service 可以为多种类型的计算层或者计算引擎提供服务。当前 Query Service 是一个高优先级的 OLTP 计算层，而各种 OLAP 迭代计算框架会是另外一个计算层。</li>
+<li><strong>无状态计算层：</strong> 每个计算节点都运行着一个无状态的查询计算引擎，而节点彼此间无任何通信关系。计算节点仅从 Meta Service 读取 Meta 信息以及和 Storage Service 进行交互。这样设计使得计算层集群更容易使用 K8s 管理或部署在云上。每个查询计算引擎都能接收客户端的请求，解析查询语句，生成抽象语法树（AST）并将 AST 传递给执行计划器和优化器，最后再交由执行器执行。</li>
+<li><strong>Shared-nothing 分布式存储层：</strong> Storage Service 采用 Shared-nothing 的分布式架构设计，共有三层，最底层是 Store Engine，它是一个单机版 Local Store Engine，提供了对本地数据的get&#x2F;put&#x2F;scan&#x2F;delete 操作，该层定义了数据操作接口，用户可以根据自己的需求定制开发相关 Local Store Plugin。目前，NebulaGraph 提供了基于 RocksDB 实现的 Store Engine。在 Local Store Engine 之上是 Consensus 层，实现了 Multi Group Raft，每一个 Partition 都对应了一组 Raft Group。在 Consensus 层上面是 Storage interfaces，这一层定义了一系列和图相关的 API。 这些 API 请求会在这一层被翻译成一组针对相应 Partition 的 KV 操作。正是这一层的存在，使得存储服务变成了真正的图存储。否则，Storage Service 只是一个 KV 存储罢了。而 NebulaGraph 没把 KV 作为一个服务单独提出，最主要的原因便是图查询过程中会涉及到大量计算，这些计算往往需要使用图的 Schema，而 KV 层没有数据 Schema 概念，这样设计比较容易实现计算下推，是 NebulaGraph 查询性能优越的主要原因。</li>
+</ul>
+<p>NebulaGraph 基于 C++ 实现，架构设计支持存储千亿顶点、万亿边，并提供毫秒级别的查询延时。我们在 3 台 48U192G 物理机搭建的集群上灌入 10 亿美食图谱数据对 NebulaGraph 的功能进行了验证。</p>
+<ul>
+<li>一跳查询 TP99 延时在 5ms 内，两跳查询 TP99 延时在 20ms 内，一般的多跳查询 TP99 延时在百毫秒内。</li>
+<li>集群在线写入速率约为20万 Records&#x2F;s。</li>
+<li>支持通过 Spark 任务离线生成 RocksDB 底层 SST File，直接将数据文件载入到集群中，即类似 HBase BulkLoad 能力。</li>
+<li>提供了类 SQL 查询语言，对于新增的业务需求，只需构造 NebulaGraph SQL 语句，易于理解且能满足各类复杂查询要求。</li>
+<li>提供联合索引、GEO 索引，可通过实体属性或者关系属性查询实体、关系，或者查询在某个经纬度附近 N 米内的实体。</li>
+<li>一个 NebulaGraph 集群中可以创建多个 Space （概念类似 MySQL 的DataBase），并且不同 Space 中的数据在物理上是隔离的。</li>
+</ul>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+	
+	
+		<li class="prev"><a href="../mysql%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2023 albert dong
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+
+</body>
+</html>
