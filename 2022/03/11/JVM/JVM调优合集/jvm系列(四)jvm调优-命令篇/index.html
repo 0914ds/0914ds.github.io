@@ -1,0 +1,470 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>jvm系列(四):jvm调优-命令篇 | Hexo</title>
+  <meta name="author" content="albert dong">
+  
+  <meta name="description" content="jvm系列(四):jvm调优-命令篇运用jvm自带的命令可以方便的在生产监控和打印堆栈的日志信息帮忙我们来定位问题！虽然jvm调优成熟的工具已经有很多：jconsole、大名鼎鼎的VisualVM，IBM的Memory Analyzer等等，但是在生产环境出现问题的时候，一方面工具的使用会有所限制，">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="jvm系列(四):jvm调优-命令篇"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">jvm系列(四):jvm调优-命令篇</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2022-03-11</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <h1 id="jvm系列-四-jvm调优-命令篇"><a href="#jvm系列-四-jvm调优-命令篇" class="headerlink" title="jvm系列(四):jvm调优-命令篇"></a>jvm系列(四):jvm调优-命令篇</h1><p>运用jvm自带的命令可以方便的在生产监控和打印堆栈的日志信息帮忙我们来定位问题！虽然jvm调优成熟的工具已经有很多：jconsole、大名鼎鼎的VisualVM，IBM的Memory Analyzer等等，但是在生产环境出现问题的时候，一方面工具的使用会有所限制，另一方面喜欢装X的我们，总喜欢在出现问题的时候在终端输入一些命令来解决。所有的工具几乎都是依赖于jdk的接口和底层的这些命令，研究这些命令的使用也让我们更能了解jvm构成和特性。</p>
+<p>Sun JDK监控和故障处理命令有jps jstat jmap jhat jstack jinfo下面做一一介绍</p>
+<h2 id="jps"><a href="#jps" class="headerlink" title="jps"></a>jps</h2><p>JVM Process Status Tool,显示指定系统内所有的HotSpot虚拟机进程。</p>
+<h3 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jps [options] [hostid]</span><br></pre></td></tr></table></figure>
+
+<h3 id="option参数"><a href="#option参数" class="headerlink" title="option参数"></a>option参数</h3><blockquote>
+<ul>
+<li>-l : 输出主类全名或jar路径</li>
+<li>-q : 只输出LVMID</li>
+<li>-m : 输出JVM启动时传递给main()的参数</li>
+<li>-v : 输出JVM启动时显示指定的JVM参数</li>
+</ul>
+</blockquote>
+<p>其中[option]、[hostid]参数也可以不写。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jps -l -m  28920 org.apache.catalina.startup.Bootstrap start  11589 org.apache.catalina.startup.Bootstrap start  25816 sun.tools.jps.Jps -l -m</span><br></pre></td></tr></table></figure>
+
+<h2 id="jstat"><a href="#jstat" class="headerlink" title="jstat"></a>jstat</h2><p>jstat(JVM statistics Monitoring)是用于监视虚拟机运行时状态信息的命令，它可以显示出虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据。</p>
+<h3 id="命令格式-1"><a href="#命令格式-1" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstat [option] LVMID [interval] [count]</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><blockquote>
+<ul>
+<li>[option] : 操作参数</li>
+<li>LVMID : 本地虚拟机进程ID</li>
+<li>[interval] : 连续输出的时间间隔</li>
+<li>[count] : 连续输出的次数</li>
+</ul>
+</blockquote>
+<h4 id="option-参数总览"><a href="#option-参数总览" class="headerlink" title="option 参数总览"></a>option 参数总览</h4><table>
+<thead>
+<tr>
+<th align="left">Option</th>
+<th align="left">Displays…</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">class</td>
+<td align="left">class loader的行为统计。Statistics on the behavior of the class loader.</td>
+</tr>
+<tr>
+<td align="left">compiler</td>
+<td align="left">HotSpt JIT编译器行为统计。Statistics of the behavior of the HotSpot Just-in-Time compiler.</td>
+</tr>
+<tr>
+<td align="left">gc</td>
+<td align="left">垃圾回收堆的行为统计。Statistics of the behavior of the garbage collected heap.</td>
+</tr>
+<tr>
+<td align="left">gccapacity</td>
+<td align="left">各个垃圾回收代容量(young,old,perm)和他们相应的空间统计。Statistics of the capacities of the generations and their corresponding spaces.</td>
+</tr>
+<tr>
+<td align="left">gcutil</td>
+<td align="left">垃圾回收统计概述。Summary of garbage collection statistics.</td>
+</tr>
+<tr>
+<td align="left">gccause</td>
+<td align="left">垃圾收集统计概述（同-gcutil），附加最近两次垃圾回收事件的原因。Summary of garbage collection statistics (same as -gcutil), with the cause of the last and</td>
+</tr>
+<tr>
+<td align="left">gcnew</td>
+<td align="left">新生代行为统计。Statistics of the behavior of the new generation.</td>
+</tr>
+<tr>
+<td align="left">gcnewcapacity</td>
+<td align="left">新生代与其相应的内存空间的统计。Statistics of the sizes of the new generations and its corresponding spaces.</td>
+</tr>
+<tr>
+<td align="left">gcold</td>
+<td align="left">年老代和永生代行为统计。Statistics of the behavior of the old and permanent generations.</td>
+</tr>
+<tr>
+<td align="left">gcoldcapacity</td>
+<td align="left">年老代行为统计。Statistics of the sizes of the old generation.</td>
+</tr>
+<tr>
+<td align="left">gcpermcapacity</td>
+<td align="left">永生代行为统计。Statistics of the sizes of the permanent generation.</td>
+</tr>
+<tr>
+<td align="left">printcompilation</td>
+<td align="left">HotSpot编译方法统计。HotSpot compilation method statistics.</td>
+</tr>
+</tbody></table>
+<h4 id="option-参数详解"><a href="#option-参数详解" class="headerlink" title="option 参数详解"></a>option 参数详解</h4><h5 id="class"><a href="#class" class="headerlink" title="-class"></a>-class</h5><p>监视类装载、卸载数量、总空间以及耗费的时间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -class 11589 Loaded  Bytes  Unloaded  Bytes     Time     7035  14506.3     0     0.0       3.67</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>Loaded : 加载class的数量</li>
+<li>Bytes : class字节大小</li>
+<li>Unloaded : 未加载class的数量</li>
+<li>Bytes : 未加载class的字节大小</li>
+<li>Time : 加载时间</li>
+</ul>
+</blockquote>
+<h5 id="compiler"><a href="#compiler" class="headerlink" title="-compiler"></a>-compiler</h5><p>输出JIT编译过的方法数量耗时等</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -compiler 1262Compiled Failed Invalid   Time   FailedType FailedMethod    2573      1       0    47.60          1 org/apache/catalina/loader/WebappClassLoader findResourceInternal  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>Compiled : 编译数量</li>
+<li>Failed : 编译失败数量</li>
+<li>Invalid : 无效数量</li>
+<li>Time : 编译耗时</li>
+<li>FailedType : 失败类型</li>
+<li>FailedMethod : 失败方法的全限定名</li>
+</ul>
+</blockquote>
+<h5 id="gc"><a href="#gc" class="headerlink" title="-gc"></a>-gc</h5><p>垃圾回收堆的行为统计，<strong>常用命令</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gc 1262 S0C    S1C     S0U     S1U   EC       EU        OC         OU        PC       PU         YGC    YGCT    FGC    FGCT     GCT   26112.0 24064.0 6562.5  0.0   564224.0 76274.5   434176.0   388518.3  524288.0 42724.7    320    6.417   1      0.398    6.815</span><br></pre></td></tr></table></figure>
+
+<p><strong>C即Capacity 总容量，U即Used 已使用的容量</strong></p>
+<blockquote>
+<ul>
+<li>S0C : survivor0区的总容量</li>
+<li>S1C : survivor1区的总容量</li>
+<li>S0U : survivor0区已使用的容量</li>
+<li>S1C : survivor1区已使用的容量</li>
+<li>EC : Eden区的总容量</li>
+<li>EU : Eden区已使用的容量</li>
+<li>OC : Old区的总容量</li>
+<li>OU : Old区已使用的容量</li>
+<li>PC 当前perm的容量 (KB)</li>
+<li>PU perm的使用 (KB)</li>
+<li>YGC : 新生代垃圾回收次数</li>
+<li>YGCT : 新生代垃圾回收时间</li>
+<li>FGC : 老年代垃圾回收次数</li>
+<li>FGCT : 老年代垃圾回收时间</li>
+<li>GCT : 垃圾回收总消耗时间</li>
+</ul>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gc 1262 2000 20</span><br></pre></td></tr></table></figure>
+
+<p>这个命令意思就是每隔2000ms输出1262的gc情况，一共输出20次</p>
+<h5 id="gccapacity"><a href="#gccapacity" class="headerlink" title="-gccapacity"></a>-gccapacity</h5><p>同-gc，不过还会输出Java堆各区域使用到的最大、最小空间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gccapacity 1262 NGCMN    NGCMX     NGC    S0C   S1C       EC         OGCMN      OGCMX      OGC        OC       PGCMN    PGCMX     PGC      PC         YGC    FGC 614400.0 614400.0 614400.0 26112.0 24064.0 564224.0   434176.0   434176.0   434176.0   434176.0 524288.0 1048576.0 524288.0 524288.0    320     1  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>NGCMN : 新生代占用的最小空间</li>
+<li>NGCMX : 新生代占用的最大空间</li>
+<li>OGCMN : 老年代占用的最小空间</li>
+<li>OGCMX : 老年代占用的最大空间</li>
+<li>OGC：当前年老代的容量 (KB)</li>
+<li>OC：当前年老代的空间 (KB)</li>
+<li>PGCMN : perm占用的最小空间</li>
+<li>PGCMX : perm占用的最大空间</li>
+</ul>
+</blockquote>
+<h5 id="gcutil"><a href="#gcutil" class="headerlink" title="-gcutil"></a>-gcutil</h5><p>同-gc，不过输出的是已使用空间占总空间的百分比</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcutil 28920  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT    12.45   0.00  33.85   0.00   4.44  4       0.242     0    0.000    0.242</span><br></pre></td></tr></table></figure>
+
+<h5 id="gccause"><a href="#gccause" class="headerlink" title="-gccause"></a>-gccause</h5><p>垃圾收集统计概述（同-gcutil），附加最近两次垃圾回收事件的原因</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gccause 28920  S0     S1     E      O      P       YGC     YGCT    FGC    FGCT     GCT    LGCC                 GCC                  12.45   0.00  33.85   0.00   4.44      4    0.242     0    0.000    0.242   Allocation Failure   No GC  </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>LGCC：最近垃圾回收的原因</li>
+<li>GCC：当前垃圾回收的原因</li>
+</ul>
+</blockquote>
+<h5 id="gcnew"><a href="#gcnew" class="headerlink" title="-gcnew"></a>-gcnew</h5><p>统计新生代的行为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcnew 28920 S0C      S1C      S0U        S1U  TT  MTT  DSS      EC        EU         YGC     YGCT   419392.0 419392.0 52231.8    0.0  6   6    209696.0 3355520.0 1172246.0  4       0.242</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>TT：Tenuring threshold(提升阈值)</li>
+<li>MTT：最大的tenuring threshold</li>
+<li>DSS：survivor区域大小 (KB)</li>
+</ul>
+</blockquote>
+<h5 id="gcnewcapacity"><a href="#gcnewcapacity" class="headerlink" title="-gcnewcapacity"></a>-gcnewcapacity</h5><p>新生代与其相应的内存空间的统计</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcnewcapacity 28920  NGCMN      NGCMX       NGC      S0CMX     S0C     S1CMX     S1C       ECMX        EC        YGC   FGC  4194304.0  4194304.0  4194304.0 419392.0 419392.0 419392.0 419392.0  3355520.0  3355520.0     4     0</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>NGC:当前年轻代的容量 (KB)</li>
+<li>S0CMX:最大的S0空间 (KB)</li>
+<li>S0C:当前S0空间 (KB)</li>
+<li>ECMX:最大eden空间 (KB)</li>
+<li>EC:当前eden空间 (KB)</li>
+</ul>
+</blockquote>
+<h5 id="gcold"><a href="#gcold" class="headerlink" title="-gcold"></a>-gcold</h5><p>统计旧生代的行为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcold 28920   PC       PU        OC           OU       YGC    FGC    FGCT     GCT   1048576.0  46561.7   6291456.0     0.0      4      0      0.000    0.242</span><br></pre></td></tr></table></figure>
+
+<h5 id="gcoldcapacity"><a href="#gcoldcapacity" class="headerlink" title="-gcoldcapacity"></a>-gcoldcapacity</h5><p>统计旧生代的大小和空间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcoldcapacity 28920   OGCMN       OGCMX        OGC         OC         YGC   FGC    FGCT     GCT     6291456.0   6291456.0   6291456.0   6291456.0     4     0    0.000    0.242</span><br></pre></td></tr></table></figure>
+
+<h5 id="gcpermcapacity"><a href="#gcpermcapacity" class="headerlink" title="-gcpermcapacity"></a>-gcpermcapacity</h5><p>永生代行为统计</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcpermcapacity 28920    PGCMN      PGCMX       PGC         PC      YGC   FGC    FGCT     GCT    1048576.0  2097152.0  1048576.0  1048576.0     4     0    0.000    0.242</span><br></pre></td></tr></table></figure>
+
+<h5 id="printcompilation"><a href="#printcompilation" class="headerlink" title="-printcompilation"></a>-printcompilation</h5><p>hotspot编译方法统计</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -printcompilation 28920    Compiled  Size  Type Method    1291      78     1    java/util/ArrayList indexOf</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li>Compiled：被执行的编译任务的数量</li>
+<li>Size：方法字节码的字节数</li>
+<li>Type：编译类型</li>
+<li>Method：编译方法的类名和方法名。类名使用”&#x2F;“ 代替 “.” 作为空间分隔符. 方法名是给出类的方法名. 格式是一致于HotSpot - XX:+PrintComplation 选项</li>
+</ul>
+</blockquote>
+<h2 id="jmap"><a href="#jmap" class="headerlink" title="jmap"></a>jmap</h2><p>jmap(JVM Memory Map)命令用于生成heap dump文件，如果不使用这个命令，还阔以使用-XX:+HeapDumpOnOutOfMemoryError参数来让虚拟机出现OOM的时候·自动生成dump文件。 jmap不仅能生成dump文件，还阔以查询finalize执行队列、Java堆和永久代的详细信息，如当前使用率、当前使用的是哪种收集器等。</p>
+<h3 id="命令格式-2"><a href="#命令格式-2" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmap [option] LVMID</span><br></pre></td></tr></table></figure>
+
+<h3 id="option参数-1"><a href="#option参数-1" class="headerlink" title="option参数"></a>option参数</h3><blockquote>
+<ul>
+<li>dump : 生成堆转储快照</li>
+<li>finalizerinfo : 显示在F-Queue队列等待Finalizer线程执行finalizer方法的对象</li>
+<li>heap : 显示Java堆详细信息</li>
+<li>histo : 显示堆中对象的统计信息</li>
+<li>permstat : to print permanent generation statistics</li>
+<li>F : 当-dump没有响应时，强制生成dump快照</li>
+</ul>
+</blockquote>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><h5 id="dump"><a href="#dump" class="headerlink" title="-dump"></a>-dump</h5><p>常用格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-dump::live,format=b,file=&lt;filename&gt; pid </span><br></pre></td></tr></table></figure>
+
+<p>dump堆到文件,format指定输出格式，live指明是活着的对象,file指定文件名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -dump:live,format=b,file=dump.hprof 28920  Dumping heap to /home/xxx/dump.hprof ...  Heap dump file created</span><br></pre></td></tr></table></figure>
+
+<p>dump.hprof这个后缀是为了后续可以直接用MAT(Memory Anlysis Tool)打开。</p>
+<h5 id="finalizerinfo"><a href="#finalizerinfo" class="headerlink" title="-finalizerinfo"></a>-finalizerinfo</h5><p>打印等待回收对象的信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -finalizerinfo 28920  Attaching to process ID 28920, please wait...  Debugger attached successfully.  Server compiler detected.  JVM version is 24.71-b01  Number of objects pending for finalization: 0</span><br></pre></td></tr></table></figure>
+
+<p>可以看到当前F-QUEUE队列中并没有等待Finalizer线程执行finalizer方法的对象。</p>
+<h5 id="heap"><a href="#heap" class="headerlink" title="-heap"></a>-heap</h5><p>打印heap的概要信息，GC使用的算法，heap的配置及wise heap的使用情况,可以用此来判断内存目前的使用情况以及垃圾回收情况</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -heap 28920  Attaching to process ID 28920, please wait...  Debugger attached successfully.  Server compiler detected.  JVM version is 24.71-b01    using thread-local object allocation.  Parallel GC with 4 thread(s)//GC 方式    Heap Configuration: //堆内存初始化配置     MinHeapFreeRatio = 0 //对应jvm启动参数-XX:MinHeapFreeRatio设置JVM堆最小空闲比率(default 40)     MaxHeapFreeRatio = 100 //对应jvm启动参数 -XX:MaxHeapFreeRatio设置JVM堆最大空闲比率(default 70)     MaxHeapSize      = 2082471936 (1986.0MB) //对应jvm启动参数-XX:MaxHeapSize=设置JVM堆的最大大小     NewSize          = 1310720 (1.25MB)//对应jvm启动参数-XX:NewSize=设置JVM堆的‘新生代’的默认大小     MaxNewSize       = 17592186044415 MB//对应jvm启动参数-XX:MaxNewSize=设置JVM堆的‘新生代’的最大大小     OldSize          = 5439488 (5.1875MB)//对应jvm启动参数-XX:OldSize=&lt;value&gt;:设置JVM堆的‘老生代’的大小     NewRatio         = 2 //对应jvm启动参数-XX:NewRatio=:‘新生代’和‘老生代’的大小比率     SurvivorRatio    = 8 //对应jvm启动参数-XX:SurvivorRatio=设置年轻代中Eden区与Survivor区的大小比值      PermSize         = 21757952 (20.75MB)  //对应jvm启动参数-XX:PermSize=&lt;value&gt;:设置JVM堆的‘永生代’的初始大小     MaxPermSize      = 85983232 (82.0MB)//对应jvm启动参数-XX:MaxPermSize=&lt;value&gt;:设置JVM堆的‘永生代’的最大大小     G1HeapRegionSize = 0 (0.0MB)    Heap Usage://堆内存使用情况  PS Young Generation  Eden Space://Eden区内存分布     capacity = 33030144 (31.5MB)//Eden区总容量     used     = 1524040 (1.4534378051757812MB)  //Eden区已使用     free     = 31506104 (30.04656219482422MB)  //Eden区剩余容量     4.614088270399305% used //Eden区使用比率  From Space:  //其中一个Survivor区的内存分布     capacity = 5242880 (5.0MB)     used     = 0 (0.0MB)     free     = 5242880 (5.0MB)     0.0% used  To Space:  //另一个Survivor区的内存分布     capacity = 5242880 (5.0MB)     used     = 0 (0.0MB)     free     = 5242880 (5.0MB)     0.0% used  PS Old Generation //当前的Old区内存分布     capacity = 86507520 (82.5MB)     used     = 0 (0.0MB)     free     = 86507520 (82.5MB)     0.0% used  PS Perm Generation//当前的 “永生代” 内存分布     capacity = 22020096 (21.0MB)     used     = 2496528 (2.3808746337890625MB)     free     = 19523568 (18.619125366210938MB)     11.337498256138392% used    670 interned Strings occupying 43720 bytes.</span><br></pre></td></tr></table></figure>
+
+<p>可以很清楚的看到Java堆中各个区域目前的情况。</p>
+<h5 id="histo"><a href="#histo" class="headerlink" title="-histo"></a>-histo</h5><p>打印堆的对象统计，包括对象数、内存大小等等 （因为在dump:live前会进行full gc，如果带上live则只统计活对象，因此不加live的堆大小要大于加live堆的大小 ）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -histo:live 28920 | more num     #instances         #bytes  class name----------------------------------------------   1:         83613       12012248  &lt;constMethodKlass&gt;   2:         23868       11450280  [B   3:         83613       10716064  &lt;methodKlass&gt;   4:         76287       10412128  [C   5:          8227        9021176  &lt;constantPoolKlass&gt;   6:          8227        5830256  &lt;instanceKlassKlass&gt;   7:          7031        5156480  &lt;constantPoolCacheKlass&gt;   8:         73627        1767048  java.lang.String   9:          2260        1348848  &lt;methodDataKlass&gt;  10:          8856         849296  java.lang.Class  ....</span><br></pre></td></tr></table></figure>
+
+<p>仅仅打印了前10行</p>
+<p>xml class name是对象类型，说明如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">B  byteC  charD  doubleF  floatI  intJ  longZ  boolean[  数组，如[I表示int[][L+类名 其他对象</span><br></pre></td></tr></table></figure>
+
+<h5 id="permstat"><a href="#permstat" class="headerlink" title="-permstat"></a>-permstat</h5><p>打印Java堆内存的永久保存区域的类加载器的智能统计信息。对于每个类加载器而言，它的名称、活跃度、地址、父类加载器、它所加载的类的数量和大小都会被打印。此外，包含的字符串数量和大小也会被打印。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -permstat 28920  Attaching to process ID 28920, please wait...  Debugger attached successfully.  Server compiler detected.  JVM version is 24.71-b01  finding class loader instances ..done.  computing per loader stat ..done.  please wait.. computing liveness.liveness analysis may be inaccurate ...  class_loader            classes bytes   parent_loader           alive?  type    &lt;bootstrap&gt;             3111    18154296          null          live    &lt;internal&gt;  0x0000000600905cf8      1       1888    0x0000000600087f08      dead    sun/reflect/DelegatingClassLoader@0x00000007800500a0  0x00000006008fcb48      1       1888    0x0000000600087f08      dead    sun/reflect/DelegatingClassLoader@0x00000007800500a0  0x00000006016db798      0       0       0x00000006008d3fc0      dead    java/util/ResourceBundle$RBClassLoader@0x0000000780626ec0  0x00000006008d6810      1       3056      null          dead    sun/reflect/DelegatingClassLoader@0x00000007800500a0</span><br></pre></td></tr></table></figure>
+
+<h5 id="F"><a href="#F" class="headerlink" title="-F"></a>-F</h5><p>强制模式。如果指定的pid没有响应，请使用jmap -dump或jmap -histo选项。此模式下，不支持live子选项。</p>
+<h2 id="jhat"><a href="#jhat" class="headerlink" title="jhat"></a>jhat</h2><p>jhat(JVM Heap Analysis Tool)命令是与jmap搭配使用，用来分析jmap生成的dump，jhat内置了一个微型的HTTP&#x2F;HTML服务器，生成dump的分析结果后，可以在浏览器中查看。在此要注意，一般不会直接在服务器上进行分析，因为jhat是一个耗时并且耗费硬件资源的过程，一般把服务器生成的dump文件复制到本地或其他机器上进行分析。</p>
+<h3 id="命令格式-3"><a href="#命令格式-3" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jhat [dumpfile]</span><br></pre></td></tr></table></figure>
+
+<h3 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h3><blockquote>
+<ul>
+<li>-stack false|true 关闭对象分配调用栈跟踪(tracking object allocation call stack)。 如果分配位置信息在堆转储中不可用. 则必须将此标志设置为 false. 默认值为 true.&gt;</li>
+<li>-refs false|true 关闭对象引用跟踪(tracking of references to objects)。 默认值为 true. 默认情况下, 返回的指针是指向其他特定对象的对象,如反向链接或输入引用(referrers or incoming references), 会统计&#x2F;计算堆中的所有对象。&gt;</li>
+<li>-port port-number 设置 jhat HTTP server 的端口号. 默认值 7000.&gt;</li>
+<li>-exclude exclude-file 指定对象查询时需要排除的数据成员列表文件(a file that lists data members that should be excluded from the reachable objects query)。 例如, 如果文件列列出了 java.lang.String.value , 那么当从某个特定对象 Object o 计算可达的对象列表时, 引用路径涉及 java.lang.String.value 的都会被排除。&gt;</li>
+<li>-baseline exclude-file 指定一个基准堆转储(baseline heap dump)。 在两个 heap dumps 中有相同 object ID 的对象会被标记为不是新的(marked as not being new). 其他对象被标记为新的(new). 在比较两个不同的堆转储时很有用.&gt;</li>
+<li>-debug int 设置 debug 级别. 0 表示不输出调试信息。 值越大则表示输出更详细的 debug 信息.&gt;</li>
+<li>-version 启动后只显示版本信息就退出&gt;</li>
+<li>-J&lt; flag &gt; 因为 jhat 命令实际上会启动一个JVM来执行, 通过 -J 可以在启动JVM时传入一些启动参数. 例如, -J-Xmx512m 则指定运行 jhat 的Java虚拟机使用的最大堆内存为 512 MB. 如果需要使用多个JVM启动参数,则传入多个 -Jxxxxxx.</li>
+</ul>
+</blockquote>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jhat -J-Xmx512m dump.hprof  eading from dump.hprof...  Dump file created Fri Mar 11 17:13:42 CST 2016  Snapshot read, resolving...  Resolving 271678 objects...  Chasing references, expect 54 dots......................................................  Eliminating duplicate references......................................................  Snapshot resolved.  Started HTTP server on port 7000  Server is ready.</span><br></pre></td></tr></table></figure>
+
+<p>中间的-J-Xmx512m是在dump快照很大的情况下分配512M内存去启动HTTP服务器，运行完之后就可在浏览器打开Http:&#x2F;&#x2F;localhost:7000进行快照分析 堆快照分析主要在最后面的Heap Histogram里，里面根据class列出了dump的时候所有存活对象。</p>
+<p><strong>分析同样一个dump快照，MAT需要的额外内存比jhat要小的多的多，所以建议使用MAT来进行分析，当然也看个人偏好。</strong></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>打开浏览器Http:&#x2F;&#x2F;localhost:7000，该页面提供了几个查询功能可供使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">All classes including platformShow all members of the rootsetShow instance counts for all classes (including platform)Show instance counts for all classes (excluding platform)Show heap histogramShow finalizer summaryExecute Object Query Language (OQL) query</span><br></pre></td></tr></table></figure>
+
+<p>一般查看堆异常情况主要看这个两个部分： Show instance counts for all classes (excluding platform)，平台外的所有对象信息。如下图： </p>
+<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%9B%9B)jvm%E8%B0%83%E4%BC%98-%E5%91%BD%E4%BB%A4%E7%AF%87//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130632.png" alt="微信截图_20230702130632"></p>
+<p>Show heap histogram 以树状图形式展示堆情况。如下图：</p>
+<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%9B%9B)jvm%E8%B0%83%E4%BC%98-%E5%91%BD%E4%BB%A4%E7%AF%87//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130713.png" alt="微信截图_20230702130713"></p>
+<p>具体排查时需要结合代码，观察是否大量应该被回收的对象在一直被引用或者是否有占用内存特别大的对象无法被回收。<br><strong>一般情况，会down到客户端用工具来分析</strong></p>
+<h2 id="jstack"><a href="#jstack" class="headerlink" title="jstack"></a>jstack</h2><p>jstack用于生成java虚拟机当前时刻的线程快照。线程快照是当前java虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等。 线程出现停顿的时候通过jstack来查看各个线程的调用堆栈，就可以知道没有响应的线程到底在后台做什么事情，或者等待什么资源。 如果java程序崩溃生成core文件，jstack工具可以用来获得core文件的java stack和native stack的信息，从而可以轻松地知道java程序是如何崩溃和在程序何处发生问题。另外，jstack工具还可以附属到正在运行的java程序中，看到当时运行的java程序的java stack和native stack的信息, 如果现在运行的java程序呈现hung的状态，jstack是非常有用的。</p>
+<h3 id="命令格式-4"><a href="#命令格式-4" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack [option] LVMID</span><br></pre></td></tr></table></figure>
+
+<h3 id="option参数-2"><a href="#option参数-2" class="headerlink" title="option参数"></a>option参数</h3><blockquote>
+<ul>
+<li>-F : 当正常输出请求不被响应时，强制输出线程堆栈</li>
+<li>-l : 除堆栈外，显示关于锁的附加信息</li>
+<li>-m : 如果调用到本地方法的话，可以显示C&#x2F;C++的堆栈</li>
+</ul>
+</blockquote>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstack -l 11494|more2016-07-28 13:40:04Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.71-b01 mixed mode):&quot;Attach Listener&quot; daemon prio=10 tid=0x00007febb0002000 nid=0x6b6f waiting on condition [0x0000000000000000]   java.lang.Thread.State: RUNNABLE   Locked ownable synchronizers:        - None&quot;http-bio-8005-exec-2&quot; daemon prio=10 tid=0x00007feb94028000 nid=0x7b8c waiting on condition [0x00007fea8f56e000]   java.lang.Thread.State: WAITING (parking)        at sun.misc.Unsafe.park(Native Method)        - parking to wait for  &lt;0x00000000cae09b80&gt; (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)        at java.util.concurrent.locks.LockSupport.park(LockSupport.java:186)        at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2043)        at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)        at org.apache.tomcat.util.threads.TaskQueue.take(TaskQueue.java:104)        at org.apache.tomcat.util.threads.TaskQueue.take(TaskQueue.java:32)        at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1068)        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)        at java.lang.Thread.run(Thread.java:745)   Locked ownable synchronizers:        - None      .....</span><br></pre></td></tr></table></figure>
+
+<h3 id="分析-1"><a href="#分析-1" class="headerlink" title="分析"></a>分析</h3><p>这里有一篇文章解释的很好 分析打印出的文件内容</p>
+<h2 id="jinfo"><a href="#jinfo" class="headerlink" title="jinfo"></a>jinfo</h2><p>jinfo(JVM Configuration info)这个命令作用是实时查看和调整虚拟机运行参数。 之前的jps -v口令只能查看到显示指定的参数，如果想要查看未被显示指定的参数的值就要使用jinfo口令</p>
+<h3 id="命令格式-5"><a href="#命令格式-5" class="headerlink" title="命令格式"></a>命令格式</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jinfo [option] [args] LVMID</span><br></pre></td></tr></table></figure>
+
+<h3 id="option参数-3"><a href="#option参数-3" class="headerlink" title="option参数"></a>option参数</h3><blockquote>
+<ul>
+<li>-flag : 输出指定args参数的值</li>
+<li>-flags : 不需要args参数，输出所有JVM参数的值</li>
+<li>-sysprops : 输出系统属性，等同于System.getProperties()</li>
+</ul>
+</blockquote>
+<h3 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jinfo -flag 11494-XX:CMSInitiatingOccupancyFraction=80</span><br></pre></td></tr></table></figure>
+
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+	
+	
+		<li class="prev"><a href="../jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="../../../../10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2023 albert dong
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+
+</body>
+</html>
