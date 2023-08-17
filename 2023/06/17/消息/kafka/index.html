@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>kafka - blog</title><link rel="manifest" href="../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="kafka Kafka 本质上是⼀个消息队列。与zeromq不同的是，Kafka是一个独立的框架而不是一个库。这里主要介绍其原理，至于具体的安装等操作不做介绍，只是提示一下，第一次运行时，先设置前台运行，看会不会报错。 架构 注意下图没有画上zookeeper，请自行脑补。kafka需要连接到zookeeper，来完成注册发现等集群操作。broker都是由zookeeper管理。"><meta property="og:type" content="blog"><meta property="og:title" content="kafka"><meta property="og:url" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka/"><meta property="og:site_name" content="blog"><meta property="og:description" content="kafka Kafka 本质上是⼀个消息队列。与zeromq不同的是，Kafka是一个独立的框架而不是一个库。这里主要介绍其原理，至于具体的安装等操作不做介绍，只是提示一下，第一次运行时，先设置前台运行，看会不会报错。 架构 注意下图没有画上zookeeper，请自行脑补。kafka需要连接到zookeeper，来完成注册发现等集群操作。broker都是由zookeeper管理。"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220539.png"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220948.png"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9a196aac8d47479f82b0046b6b51aa65.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//60904efb05104cdea48f0e38cb134cbd.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9715111fbe814854b01de917a3c4632d.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//5ee45a5558bd4528a47a5a3b82749828.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//2e8e7674b862451b95355ef670e259db.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//0e3ff9f5402f43c8a7424a1c4bcdfddd.jpg"><meta property="og:image" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//3d63a1c330944ccbb834619c7ec32243.jpg"><meta property="article:published_time" content="2023-06-17T06:13:16.000Z"><meta property="article:modified_time" content="2023-08-17T17:09:44.126Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220539.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka/"},"headline":"kafka","image":["https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220539.png","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220948.png","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9a196aac8d47479f82b0046b6b51aa65.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//60904efb05104cdea48f0e38cb134cbd.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9715111fbe814854b01de917a3c4632d.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//5ee45a5558bd4528a47a5a3b82749828.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//2e8e7674b862451b95355ef670e259db.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//0e3ff9f5402f43c8a7424a1c4bcdfddd.jpg","https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka//3d63a1c330944ccbb834619c7ec32243.jpg"],"datePublished":"2023-06-17T06:13:16.000Z","dateModified":"2023-08-17T17:09:44.126Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"kafka\r Kafka\r 本质上是⼀个消息队列。与zeromq不同的是，Kafka是一个独立的框架而不是一个库。这里主要介绍其原理，至于具体的安装等操作不做介绍，只是提示一下，第一次运行时，先设置前台运行，看会不会报错。\r 架构\r 注意下图没有画上zookeeper，请自行脑补。kafka需要连接到zookeeper，来完成注册发现等集群操作。broker都是由zookeeper管理。"}</script><link rel="canonical" href="https://0914ds.github.io/2023/06/17/%E6%B6%88%E6%81%AF/kafka/"><link rel="icon" href="../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../index.html"><img src="../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2023-06-17T06:13:16.000Z" title="2023/6/17 14:13:16">2023-06-17</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-08-17T17:09:44.126Z" title="2023/8/18 01:09:44">2023-08-18</time></span><span class="level-item"><a class="link-muted" href="../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></span><span class="level-item">30 minutes read (About 4531 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">kafka</h1><div class="content"><h1 id="kafka">kafka</h1>
+<p><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=Kafka&amp;spm=1001.2101.3001.7020">Kafka</a>
+本质上是⼀个消息队列。与zeromq不同的是，Kafka是一个独立的框架而不是一个库。这里主要介绍其原理，至于具体的安装等操作不做介绍，只是提示一下，第一次运行时，先设置前台运行，看会不会报错。</p>
+<h2 id="架构">架构</h2>
+<p>注意下图没有画上zookeeper，请自行脑补。kafka需要连接到zookeeper，来完成注册发现等集群操作。broker都是由zookeeper管理。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220539.png" alt="微信截图_20230706220539">
+<figcaption aria-hidden="true">微信截图_20230706220539</figcaption>
+</figure>
+<p>先给出 Kafka ⼀些重要概念，让⼤家对 Kafka
+有个整体的认识和感知，后⾯还会详细的解析每⼀个概念的作⽤以及更深⼊的原理：</p>
+<ul>
+<li>Producer：消息⽣产者，向 Kafka Broker 发消息的客户端。</li>
+<li>Consumer：消息消费者，从 Kafka Broker
+取消息的客户端。Kafka支持持久化，生产者退出后，未消费的消息仍可被消费</li>
+<li>Consumer
+Group：消费者组(CG），消费者组内每个消费者负责消费不同分区的数据，提⾼消费能⼒。⼀个分区只能由组内⼀个费者消费，消费者组之间互不影响。所有的消费者都属于某个消费者组，即消费者组是逻辑上的⼀个订阅者</li>
+<li>Broker：⼀台 Kafka 机器就是⼀个 Broker。⼀个集群(kafka
+cluster)由多个 Broker 组成。⼀个 Broker 可以容纳多个 Topic</li>
+<li>Controller：由zookeeper选举其中一个Broker产生。它的主要作用是在
+Apache ZooKeeper 的帮助下管理和协调整个 Kafka 集群。</li>
+<li>Topic：可以理解为⼀个队列，Topic
+将消息分类，⽣产者和消费者⾯向的是同⼀个 Topic。</li>
+<li>Partition：为了实现扩展性，提⾼并发能⼒，⼀个⾮常⼤的 Topic
+可以分布到多个 Broker上，⼀个 Topic 可以分为多个
+Partition，同⼀个topic在不同的分区的数据是不重复的，每个 Partition
+是⼀个有序的队列，其表现形式就是⼀个⼀个的⽂件夹。不同Partition可以部署在同一台机器上，但不建议这么做。</li>
+<li>Replication：每⼀个分区都有多个副本，副本的作⽤是做备胎。当主分区(Leader）故障的时候会选择⼀个备胎(Follower）上位，成为Leader。在kafka中默认副本的最⼤数量是10个，且副本的数量不能⼤于Broker的数量，follower和leader绝对是在不同的机器，同⼀机器对同⼀个分区也只可能存放⼀个副本(包括⾃⼰）。</li>
+<li>Message：每⼀条发送的消息主体。</li>
+<li>Leader：每个分区多个副本的“主”副本，⽣产者发送数据的对象，以及消费者消费数据的对象，都是
+Leader。</li>
+<li>Follower：每个分区多个副本的“从”副本，使用发布订阅模式主动拉取Leader的数据(与redis不同），实时从
+Leader 中同步数据，保持和 Leader 数据的同步。Leader 发⽣故障时，某个
+Follower 还会成为新的 Leader。</li>
+<li>Offset：消费者消费的位置信息，监控数据消费到什么位置，当消费者挂掉再重新恢复的时候，可以从消费位置继续消费。</li>
+<li>ZooKeeper：Kafka 集群能够正常⼯作，需要依赖于 ZooKeeper，ZooKeeper
+帮助 Kafka存储和管理集群信息。 High Level API 和Low Level API
+：高水平API，kafka本身定义的行为，屏蔽细节管理，使用方便；低水平API细节需要自己处理，较为灵活但是复杂。</li>
+<li>kafka 存储的消息来⾃任意多被称为 Producer
+⽣产者的进程。数据从⽽可以被发布到不同的Topic 主题下的不同 Partition
+分区。在⼀个分区内，这些消息被索引并连同时间戳存储在⼀起。其它被称为
+Consumer 消费者的进程可以从分区订阅消息。 Kafka
+运⾏在⼀个由⼀台或多台服务器组成的集群上，并且分区可以跨集群结点分布。</li>
+</ul>
+<h2 id="工作流程">工作流程</h2>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//微信截图_20230706220948.png" alt="微信截图_20230706220948">
+<figcaption aria-hidden="true">微信截图_20230706220948</figcaption>
+</figure>
+<p>Kafka集群将 Record 流存储在称为 Topic
+的类中，每个记录由⼀个键、⼀个值和⼀个时间戳组成。 Kafka 中消息是以
+Topic
+进⾏分类的，⽣产者⽣产消息，消费者消费消息，⾯向的都是同⼀个Topic。Topic
+是逻辑上的概念，⽽ Partition 是物理上的概念，每个 Partition 对应于⼀个
+log ⽂件，该log ⽂件中存储的就是 Producer ⽣产的数据。Producer
+⽣产的数据会不断追加到该 log ⽂件末端，且每条数据都有⾃⼰的
+Offset。消费者组中的每个消费者，都会实时记录⾃⼰消费到了哪个
+Offset，以便出错恢复时，从上次的位置继续消费。</p>
+<p>Kafka集群将 Record 流存储在称为 Topic
+的类中，每个记录由⼀个键、⼀个值和⼀个时间戳组成。 Kafka 中消息是以
+Topic
+进⾏分类的，⽣产者⽣产消息，消费者消费消息，⾯向的都是同⼀个Topic。Topic
+是逻辑上的概念，⽽ Partition 是物理上的概念，每个 Partition 对应于⼀个
+log ⽂件，该log ⽂件中存储的就是 Producer ⽣产的数据。Producer
+⽣产的数据会不断追加到该 log ⽂件末端，且每条数据都有⾃⼰的
+Offset。消费者组中的每个消费者，都会实时记录⾃⼰消费到了哪个
+Offset，以便出错恢复时，从上次的位置继续消费。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9a196aac8d47479f82b0046b6b51aa65.jpg" alt="9a196aac8d47479f82b0046b6b51aa65">
+<figcaption aria-hidden="true">9a196aac8d47479f82b0046b6b51aa65</figcaption>
+</figure>
+<p>这些⽂件位于同⼀⽂件下，该⽂件夹的命名规则为：topic
+名-分区号。例如，test这个 topic 有三个分区，则其对应的⽂件夹为
+test-0，test-1，test-2。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$</span> <span class="built_in">ls</span> /tmp/kafka<span class="literal">-logs</span>/<span class="built_in">test-1</span></span><br><span class="line"><span class="number">00000000000000009014</span>.index</span><br><span class="line"><span class="number">00000000000000009014</span>.log</span><br><span class="line"><span class="number">00000000000000009014</span>.timeindex</span><br><span class="line">leader<span class="literal">-epoch-checkpoint</span></span><br></pre></td></tr></table></figure>
+<p>index 和 log ⽂件以当前 Segment 的第⼀条消息的 Offset 命名。下图为
+index ⽂件和 log ⽂件的结构示意图</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//60904efb05104cdea48f0e38cb134cbd.jpg" alt="60904efb05104cdea48f0e38cb134cbd">
+<figcaption aria-hidden="true">60904efb05104cdea48f0e38cb134cbd</figcaption>
+</figure>
+<p>“.index” ⽂件存储⼤量的索引信息，“.log”
+⽂件存储⼤量的数据，索引⽂件中的元数据指向对应数据⽂件中 Message
+的物理偏移量。 使用shell命令查看索引</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./kafka<span class="literal">-dump-log</span>.sh <span class="literal">--files</span> /tmp/kafka<span class="literal">-logs</span>/<span class="built_in">test-1</span>/<span class="number">00000000000000000000</span>.index</span><br></pre></td></tr></table></figure>
+<h2 id="分区机制">分区机制</h2>
+<p>分区原因：</p>
+<p>⽅便在集群中扩展，每个 Partition
+可以通过调整以适应它所在的机器，⽽⼀个 Topic ⼜可以有多个 Partition
+组成，因此可以以 Partition 为单位读写了。
+可以提⾼并发，避免两个分区持久化的时候争夺资源。
+备份的问题。防止一台机器宕机后数据丢失的问题。 分区原则：我们需要将
+Producer 发送的数据封装成⼀个 ProducerRecord
+对象。该对象需要指定⼀些参数：</p>
+<p>topic：string 类型，NotNull。 partition：int 类型，可选。
+timestamp：long 类型，可选。 key：string 类型，可选。 value：string
+类型，可选。 headers：array 类型，Nullable。 指明 Partition
+的情况下，直接将给定的 Value 作为 Partition 的值；没有指明 Partition
+但有 Key 的情况下，将 Key 的 Hash 值与分区数取余得到 Partition
+值；既没有 Partition 又没有 Key
+的情况下，第⼀次调⽤时随机⽣成⼀个整数(后⾯每次调⽤都在这个整数上⾃增），将这个值与可⽤的分区数取余，得到
+Partition 值，也就是常说的 Round-Robin轮询算法。</p>
+<h2 id="生产者">生产者</h2>
+<p>Producer⽣产者，是数据的⼊⼝。Producer在写⼊数据的时候永远的找leader，不会直接将数据写⼊follower。下图很好地阐释了生产者的工作流程。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//9715111fbe814854b01de917a3c4632d.jpg" alt="9715111fbe814854b01de917a3c4632d">
+<figcaption aria-hidden="true">9715111fbe814854b01de917a3c4632d</figcaption>
+</figure>
+<p>这里获取分区信息，是从zookeeper中获取的。
+生产者不会每个消息都调用一次send()，这样效率太低，默认是数据攒到16K或是超时(如10ms）会send()一次。注意这里发消息是异步操作。</p>
+<h2 id="ack机制">ack机制</h2>
+<p>producer端设置request.required.acks=0；只要请求已发送出去，就算是发送完了，不关心有没有写成功。性能很好，如果是对一些日志进行分析，可以承受丢数据的情况，用这个参数，性能会很好。
+request.required.acks=1；发送一条消息，当leader
+partition写入成功以后，才算写入成功。不过这种方式也有丢数据的可能。
+request.required.acks=-1；需要ISR列表里面，所有副本都写完以后，这条消息才算写入成功。
+设计一个不丢数据的方案：数据不丢失的方案：1)分区副本 &gt;=2 2)acks = -1
+3)min.insync.replicas &gt;=2。
+下面给出此时leader出现故障的情况，可以看出，此时数据可能重复。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//5ee45a5558bd4528a47a5a3b82749828.jpg" alt="5ee45a5558bd4528a47a5a3b82749828">
+<figcaption aria-hidden="true">5ee45a5558bd4528a47a5a3b82749828</figcaption>
+</figure>
+<p>解释上面出现的几个名词。Leader维护了⼀个动态的 in-sync replica
+set(ISR）：和 Leader 保持同步的 Follower 集合。当 ISR 集合中的 Follower
+完成数据的同步之后，Leader 就会给 Follower 发送 ACK。如果 Follower
+⻓时间未向 Leader 同步数据，则该 Follower 将被踢出 ISR
+集合，该时间阈值由replica.lag.time.max.ms 参数设定。Leader
+发⽣故障后，就会从 ISR 中选举出新的 Leader。
+kafka服务端中min.insync.replicas。
+如果我们不设置的话，默认这个值是1。一个leader
+partition会维护一个ISR列表，这个值就是限制ISR列表里面
+至少得有几个副本，比如这个值是2，那么当ISR列表里面只有一个副本的时候，往这个分区插入数据的时候会报错。</p>
+<h2 id="消费者">消费者</h2>
+<p>Consumer 采⽤ Pull(拉取）模式从 Broker 中读取数据。Pull
+模式则可以根据 Consumer 的消费能⼒以适当的速率消费消息。Pull
+模式不⾜之处是，如果Kafka
+没有数据，消费者可能会陷⼊循环中，⼀直返回空数据。因为消费者从 Broker
+主动拉取数据，需要维护⼀个⻓轮询，针对这⼀点， Kafka
+的消费者在消费数据时会传⼊⼀个时⻓参数
+timeout。如果当前没有数据可供消费，Consumer
+会等待⼀段时间之后再返回，这段时⻓即为 timeout。</p>
+<h2 id="分区分配策略">分区分配策略</h2>
+<p>⼀个 Consumer Group 中有多个 Consumer，⼀个 Topic 有多个
+Partition。不同组间的消费者是相互独立的，相同组内的消费者才会协作，这就必然会涉及到Partition
+的分配问题，即确定哪个 Partition 由哪个 Consumer 来消费。 Kafka
+有三种分配策略：</p>
+<p>RoundRobin Range，默认为Range Sticky
+当消费者组内消费者发⽣变化时，会触发分区分配策略(⽅法重新分配），在分配完成前，kafka会暂停对外服务。注意为了尽量确保消息的有序执行，一个分区只能对应一个消费者，这也说明消费者的数量不能超过分区的数量。</p>
+<h4 id="range方式">range方式</h4>
+<p>Range
+⽅式是按照主题来分的，不会产⽣轮询⽅式的消费混乱问题，但是也有不足。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//2e8e7674b862451b95355ef670e259db.jpg" alt="2e8e7674b862451b95355ef670e259db">
+<figcaption aria-hidden="true">2e8e7674b862451b95355ef670e259db</figcaption>
+</figure>
+<p>注意图文不符，图片是一个例子，文字再给一个例子，以便理解。假设我们有10个分区，3个消费者，排完序的分区将会是0,1,2,3,4,5,6,7,8,9；消费者线程排完序将会是C1-0,C2-0,C3-0。然后将partitions的个数除于消费者线程的总数来决定每个消费者线程消费⼏个分区。如果除不尽，那么前⾯⼏个消费者线程将会多消费⼀个分区。
+在我们的例⼦⾥⾯，我们有10个分区，3个消费者线程， 10/3 =
+3，⽽且除不尽，那么消费者线程 C1-0将会多消费⼀个分区：C1-0 将消费 0, 1,
+2, 3 分区；C2-0将消费 4,5,6分区；C3-0将消费 7,8,9分区。
+假如我们有11个分区，那么最后分区分配的结果看起来是这样的： C1-0将消费
+0,1,2,3分区；C2-0将消费 4,5,6,7分区；C3-0 将消费 8, 9, 10 分区。
+假如我们有2个主题(T1和T2)，分别有10个分区，那么最后分区分配的结果看起来是这样的：
+C1-0 将消费 T1主题的 0, 1, 2, 3 分区以及 T2主题的 0, 1, 2, 3分区
+C2-0将消费 T1主题的 4,5,6分区以及 T2主题的 4,5,6分区 C3-0将消费 T1主题的
+7,8,9分区以及 T2主题的 7,8,9分区</p>
+<p>这就可以看出，C1-0
+消费者线程⽐其他消费者线程多消费了2个分区，这就是Range
+strategy的⼀个很明显的弊端。如下图所示，Consumer0、Consumer1
+同时订阅了主题 A 和
+B，可能造成消息分配不对等问题，当消费者组内订阅的主题越多，分区分配可能越不均衡。</p>
+<p>RoundRobin RoundRobin 轮询⽅式将分区所有作为⼀个整体进⾏ Hash
+排序，消费者组内分配分区个数最⼤差别为
+1，是按照组来分的，可以解决多个消费者消费数据不均衡的问题。
+轮询分区策略是把所有partition和所有consumer线程都列出来，然后按照hashcode进⾏排序。最后通过轮询算法分配partition给消费线程。如果所有consumer实例的订阅是相同的，那么partition会均匀分布。
+在上面的例⼦⾥⾯，假如按照
+hashCode排序完的topic-partitions组依次为T1-5,T1-3,T1-0,T1-8,T1-2,T1-1,T1-4,T1-7,T1-6,T1-9，我们的消费者线程排序为C1-0,C1-1,C2-0,C2-1，最后分区分配的结果为：
+C1-0将消费 T1-5,T1-2,T1-6分区； C1-1将消费 T1-3,T1-1,T1-9分区；
+C2-0将消费 T1-0,T1-4分区； C2-1将消费 T1-8,T1-7分区。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//0e3ff9f5402f43c8a7424a1c4bcdfddd.jpg" alt="0e3ff9f5402f43c8a7424a1c4bcdfddd">
+<figcaption aria-hidden="true">0e3ff9f5402f43c8a7424a1c4bcdfddd</figcaption>
+</figure>
+<p>图文不符。
+但是，当消费者组内订阅不同主题时，可能造成消费混乱，如下图所示，Consumer0
+订阅主题A，Consumer1 订阅主题 B。</p>
+<figure>
+<img src="/2023/06/17/%E6%B6%88%E6%81%AF/kafka//3d63a1c330944ccbb834619c7ec32243.jpg" alt="3d63a1c330944ccbb834619c7ec32243">
+<figcaption aria-hidden="true">3d63a1c330944ccbb834619c7ec32243</figcaption>
+</figure>
+<p>将 A、B 主题的分区排序后分配给消费者组，TopicB 分区中的数据可能分配到
+Consumer0 中。 因此，使⽤轮询分区策略必须满⾜两个条件：</p>
+<p>每个主题的消费者实例具有相同数量的流；
+每个消费者订阅的主题必须是相同的。
+注意，其实对于生产者而言，可以自定义push但哪个分区中，也可以使用如hash等方法。</p>
+<p>Sticky
+前两种rebalance方式需要重新映射，代价较大，特别是由于rebalance期间会暂停服务，这就要求该过程尽量短。Sticky在没有rebalance时采用轮询方式，发生rebalance时，尽量保持原映射关系，只是改变与宕机相关的映射，依然采用轮询的方式。</p>
+<p>可靠性保证
+在前面ack保障消息到了broker之后，消费者也需要有⼀定的保证，因为消费者也可能出现某些问题导致消息没有消费到。
+这里介绍一下偏移量。每个consumer内存里数据结构保存对每个topic的每个分区的消费offset，定期会提交offset，0.9版本以后，提交offset发送给kafka内部额外生成的一个topic：__consumer_offsets，提交过去的时候，
+key是group.id+topic+分区号，value就是当前offset的值，每隔一段时间，kafka内部会对这个topic进行compact(合并)，也就是每个group.id+topic+分区号就保留最新数据。
+这里引入enable.auto.commit，默认为true，也就是⾃动提交offset，⾃动提交是批量执⾏的，有⼀个时间窗⼝，这种⽅式会带来重复提交或者消息丢失的问题，所以对于⾼可靠性要求的程序，要使⽤⼿动提交。对于⾼可靠要求的应⽤来说，宁愿重复消费也不应该因为消费异常⽽导致消息丢失。当然，我们也可以使用策略来避免消息的重复消费与丢失，比如使用事务，将offset与消息执行放在同一数据库中。</p>
+<p>最后再简单介绍一个应用。kafka可以用在分布式延时队列中。创建一个额外的主题和一个定时进程，检测这个主题中是否有消息过期，过期后放在常规的消息队列中，消费者从这个常规的队列中获取消息来消费。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>kafka</p><p><a href="https://0914ds.github.io/2023/06/17/消息/kafka/">https://0914ds.github.io/2023/06/17/消息/kafka/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2023-06-17</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-08-18</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="../../../../08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">梯度下降优化</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="../../../05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/"><span class="level-item">mysql的锁机制</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#kafka"><span class="level-left"><span class="level-item">1</span><span class="level-item">kafka</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#架构"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">架构</span></span></a></li><li><a class="level is-mobile" href="#工作流程"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">工作流程</span></span></a></li><li><a class="level is-mobile" href="#分区机制"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">分区机制</span></span></a></li><li><a class="level is-mobile" href="#生产者"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">生产者</span></span></a></li><li><a class="level is-mobile" href="#ack机制"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">ack机制</span></span></a></li><li><a class="level is-mobile" href="#消费者"><span class="level-left"><span class="level-item">1.6</span><span class="level-item">消费者</span></span></a></li><li><a class="level is-mobile" href="#分区分配策略"><span class="level-left"><span class="level-item">1.7</span><span class="level-item">分区分配策略</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#range方式"><span class="level-left"><span class="level-item">1.7.1</span><span class="level-item">range方式</span></span></a></li></ul></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="../../../../08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">多元线性回归</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="">kafka</a></p><p class="categories"><a href="../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../index.html"><img src="../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="../../../../../js/column.js"></script><script src="../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>

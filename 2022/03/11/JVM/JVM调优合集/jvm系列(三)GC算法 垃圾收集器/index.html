@@ -1,75 +1,47 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  <title>jvm系列(三):GC算法 垃圾收集器 | blog</title>
-  <meta name="author" content="albert dong">
-  
-  <meta name="description" content="jvm系列(三):GC算法 垃圾收集器概述垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的 Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出">
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>jvm系列(三):GC算法 垃圾收集器 - blog</title><link rel="manifest" href="../../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="jvm系列(三):GC算法 垃圾收集器 概述 垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的 Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于 java 堆和方法区"><meta property="og:type" content="blog"><meta property="og:title" content="jvm系列(三):GC算法 垃圾收集器"><meta property="og:url" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"><meta property="og:site_name" content="blog"><meta property="og:description" content="jvm系列(三):GC算法 垃圾收集器 概述 垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的 Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于 java 堆和方法区"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123629.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123740.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123823.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123859.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123937.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124017.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124101.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124135.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124210.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124248.png"><meta property="article:published_time" content="2022-03-10T18:45:12.000Z"><meta property="article:modified_time" content="2023-07-02T05:38:22.717Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123629.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"},"headline":"jvm系列(三):GC算法 垃圾收集器","image":["https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123629.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123740.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123823.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123859.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123937.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124017.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124101.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124135.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124210.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124248.png"],"datePublished":"2022-03-10T18:45:12.000Z","dateModified":"2023-07-02T05:38:22.717Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"jvm系列(三):GC算法 垃圾收集器\r 概述\r 垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的\r Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm\r 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于\r java 堆和方法区"}</script><link rel="canonical" href="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/"><link rel="icon" href="../../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
 
-  <meta property="og:title" content="jvm系列(三):GC算法 垃圾收集器"/>
-  <meta property="og:site_name" content="blog"/>
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
 
-  
-    <meta property="og:image" content=""/>
-  
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
 
-  
-    <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
-  
-  
-    <link href="/favicon.png" rel="icon">
-  
-  
-  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
-  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-
-  <script src="/js/jquery-2.0.3.min.js"></script>
-
-  <!-- analytics -->
-  
-
-<meta name="generator" content="Hexo 6.3.0"></head>
-
-<body id="body" data-spy="scroll" data-target=".toc">
-  <div class="container" id="container">
-	<div class="content">
-	  <div class="page-header">		
-  <h1><a class="brand" href="/">blog</a><span class="split"></span><span class="title">jvm系列(三):GC算法 垃圾收集器</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2022-03-11</span></h1>
-</div>		
-
-<div class="row page">
-  <!-- cols -->	
-  
-  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
-	<!-- toc -->
-<script type="text/javascript">
-		jQuery(document).ready(function() {
- 		   generateWikiTOC('.note', '.toc',  2 , 2 );
-		});
-</script>
-  </div><!-- col-md-3 -->
-  
-  
-
-  
-  <div class="col-xs-12 col-sm-9 col-md-9 note">
-	
-
-	  <!-- content -->
-	  <h1 id="jvm系列-三-GC算法-垃圾收集器"><a href="#jvm系列-三-GC算法-垃圾收集器" class="headerlink" title="jvm系列(三):GC算法 垃圾收集器"></a>jvm系列(三):GC算法 垃圾收集器</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的 Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm 中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于 java 堆和方法区中，在程序运行期间，这部分内存的分配和使用都是动态的.</p>
-<h2 id="对象存活判断"><a href="#对象存活判断" class="headerlink" title="对象存活判断"></a>对象存活判断</h2><p>判断对象是否存活一般有两种方式：</p>
-<p><strong>引用计数</strong>：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，无法解决对象相互循环引用的问题。<br><strong>可达性分析</strong>（Reachability Analysis）：从GC Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。</p>
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2022-03-10T18:45:12.000Z" title="2022/3/11 02:45:12">2022-03-11</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-07-02T05:38:22.717Z" title="2023/7/2 13:38:22">2023-07-02</time></span><span class="level-item"><a class="link-muted" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/">JVM调优合集</a></span><span class="level-item">24 minutes read (About 3629 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">jvm系列(三):GC算法 垃圾收集器</h1><div class="content"><h1 id="jvm系列三gc算法-垃圾收集器">jvm系列(三):GC算法 垃圾收集器</h1>
+<h2 id="概述">概述</h2>
+<p>垃圾收集 Garbage Collection 通常被称为“GC”，它诞生于1960年 MIT 的
+Lisp 语言，经过半个多世纪，目前已经十分成熟了。 jvm
+中，程序计数器、虚拟机栈、本地方法栈都是随线程而生随线程而灭，栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理，因此，我们的内存垃圾回收主要集中于
+java 堆和方法区中，在程序运行期间，这部分内存的分配和使用都是动态的.</p>
+<h2 id="对象存活判断">对象存活判断</h2>
+<p>判断对象是否存活一般有两种方式：</p>
+<p><strong>引用计数</strong>：每个对象有一个引用计数属性，新增一个引用时计数加1，引用释放时计数减1，计数为0时可以回收。此方法简单，无法解决对象相互循环引用的问题。
+<strong>可达性分析</strong>（Reachability Analysis）：从GC
+Roots开始向下搜索，搜索所走过的路径称为引用链。当一个对象到GC
+Roots没有任何引用链相连时，则证明此对象是不可用的。不可达对象。</p>
 <p>在Java语言中，GC Roots包括：</p>
 <ul>
 <li>虚拟机栈中引用的对象。</li>
@@ -77,221 +49,269 @@
 <li>方法区中常量引用的对象。</li>
 <li>本地方法栈中JNI引用的对象。</li>
 </ul>
-<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><h3 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记 -清除算法"></a>标记 -清除算法</h3><p>“标记-清除”（Mark-Sweep）算法，如它的名字一样，算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。之所以说它是最基础的收集算法，是因为后续的收集算法都是基于这种思路并对其缺点进行改进而得到的。</p>
+<h2 id="垃圾收集算法">垃圾收集算法</h2>
+<h3 id="标记--清除算法">标记 -清除算法</h3>
+<p>“标记-清除”（Mark-Sweep）算法，如它的名字一样，算法分为“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。之所以说它是最基础的收集算法，是因为后续的收集算法都是基于这种思路并对其缺点进行改进而得到的。</p>
 <p>它的主要缺点有两个：一个是效率问题，标记和清除过程的效率都不高；另外一个是空间问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致，当程序在以后的运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702123629.png" alt="微信截图_20230702123629"></p>
-<h3 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h3><p>“复制”（Copying）的收集算法，它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123629.png" alt="微信截图_20230702123629">
+<figcaption aria-hidden="true">微信截图_20230702123629</figcaption>
+</figure>
+<h3 id="复制算法">复制算法</h3>
+<p>“复制”（Copying）的收集算法，它将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当这一块的内存用完了，就将还存活着的对象复制到另外一块上面，然后再把已使用过的内存空间一次清理掉。</p>
 <p>这样使得每次都是对其中的一块进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。只是这种算法的代价是将内存缩小为原来的一半，持续复制长生存期的对象则导致效率降低。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702123740.png" alt="微信截图_20230702123740"></p>
-<h3 id="标记-压缩算法"><a href="#标记-压缩算法" class="headerlink" title="标记-压缩算法"></a>标记-压缩算法</h3><p>复制收集算法在对象存活率较高时就要执行较多的复制操作，效率将会变低。更关键的是，如果不想浪费50%的空间，就需要有额外的空间进行分配担保，以应对被使用的内存中所有对象都100%存活的极端情况，所以在老年代一般不能直接选用这种算法。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123740.png" alt="微信截图_20230702123740">
+<figcaption aria-hidden="true">微信截图_20230702123740</figcaption>
+</figure>
+<h3 id="标记-压缩算法">标记-压缩算法</h3>
+<p>复制收集算法在对象存活率较高时就要执行较多的复制操作，效率将会变低。更关键的是，如果不想浪费50%的空间，就需要有额外的空间进行分配担保，以应对被使用的内存中所有对象都100%存活的极端情况，所以在老年代一般不能直接选用这种算法。</p>
 <p>根据老年代的特点，有人提出了另外一种“标记-整理”（Mark-Compact）算法，标记过程仍然与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702123823.png" alt="微信截图_20230702123823"></p>
-<h3 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h3><p>GC分代的基本假设：绝大部分对象的生命周期都非常短暂，存活时间短。</p>
-<p>“分代收集”（Generational Collection）算法，把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法。在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记-清理”或“标记-整理”算法来进行回收。</p>
-<h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2><blockquote>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123823.png" alt="微信截图_20230702123823">
+<figcaption aria-hidden="true">微信截图_20230702123823</figcaption>
+</figure>
+<h3 id="分代收集算法">分代收集算法</h3>
+<p>GC分代的基本假设：绝大部分对象的生命周期都非常短暂，存活时间短。</p>
+<p>“分代收集”（Generational
+Collection）算法，把Java堆分为新生代和老年代，这样就可以根据各个年代的特点采用最适当的收集算法。在新生代中，每次垃圾收集时都发现有大批对象死去，只有少量存活，那就选用复制算法，只需要付出少量存活对象的复制成本就可以完成收集。而老年代中因为对象存活率高、没有额外空间对它进行分配担保，就必须使用“标记-清理”或“标记-整理”算法来进行回收。</p>
+<h2 id="垃圾收集器">垃圾收集器</h2>
+<blockquote>
 <p>如果说收集算法是内存回收的方法论，垃圾收集器就是内存回收的具体实现</p>
 </blockquote>
-<h3 id="Serial收集器"><a href="#Serial收集器" class="headerlink" title="Serial收集器"></a>Serial收集器</h3><p>串行收集器是最古老，最稳定以及效率高的收集器，可能会产生较长的停顿，只使用一个线程去回收。新生代、老年代使用串行回收；新生代复制算法、老年代标记-压缩；垃圾收集的过程中会Stop The World（服务暂停）</p>
+<h3 id="serial收集器">Serial收集器</h3>
+<p>串行收集器是最古老，最稳定以及效率高的收集器，可能会产生较长的停顿，只使用一个线程去回收。新生代、老年代使用串行回收；新生代复制算法、老年代标记-压缩；垃圾收集的过程中会Stop
+The World（服务暂停）</p>
 <p>参数控制： <code>-XX:+UseSerialGC</code> 串行收集器</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702123859.png" alt="微信截图_20230702123859"></p>
-<p>ParNew收集器 ParNew收集器其实就是Serial收集器的多线程版本。新生代并行，老年代串行；新生代复制算法、老年代标记-压缩</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123859.png" alt="微信截图_20230702123859">
+<figcaption aria-hidden="true">微信截图_20230702123859</figcaption>
+</figure>
+<p>ParNew收集器
+ParNew收集器其实就是Serial收集器的多线程版本。新生代并行，老年代串行；新生代复制算法、老年代标记-压缩</p>
 <p>参数控制：</p>
-<p><code>-XX:+UseParNewGC</code> ParNew收集器<br><code>-XX:ParallelGCThreads</code> 限制线程数量</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702123937.png" alt="微信截图_20230702123937"></p>
-<h3 id="Parallel收集器"><a href="#Parallel收集器" class="headerlink" title="Parallel收集器"></a>Parallel收集器</h3><p>Parallel Scavenge收集器类似ParNew收集器，Parallel收集器更关注系统的吞吐量。可以通过参数来打开自适应调节策略，虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整这些参数以提供最合适的停顿时间或最大的吞吐量；也可以通过参数控制GC的时间不大于多少毫秒或者比例；新生代复制算法、老年代标记-压缩</p>
-<p>参数控制： <code>-XX:+UseParallelGC</code> 使用Parallel收集器+ 老年代串行</p>
-<h3 id="Parallel-Old-收集器"><a href="#Parallel-Old-收集器" class="headerlink" title="Parallel Old 收集器"></a>Parallel Old 收集器</h3><p>Parallel Old是Parallel Scavenge收集器的老年代版本，使用多线程和“标记－整理”算法。这个收集器是在JDK 1.6中才开始提供</p>
-<p>参数控制： <code>-XX:+UseParallelOldGC</code> 使用Parallel收集器+ 老年代并行</p>
-<h3 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h3><p>CMS（Concurrent Mark Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器。目前很大一部分的Java应用都集中在互联网站或B&#x2F;S系统的服务端上，这类应用尤其重视服务的响应速度，希望系统停顿时间最短，以给用户带来较好的体验。</p>
-<p>从名字（包含“Mark Sweep”）上就可以看出CMS收集器是基于“标记-清除”算法实现的，它的运作过程相对于前面几种收集器来说要更复杂一些，整个过程分为4个步骤，包括：</p>
+<p><code>-XX:+UseParNewGC</code> ParNew收集器
+<code>-XX:ParallelGCThreads</code> 限制线程数量</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702123937.png" alt="微信截图_20230702123937">
+<figcaption aria-hidden="true">微信截图_20230702123937</figcaption>
+</figure>
+<h3 id="parallel收集器">Parallel收集器</h3>
+<p>Parallel
+Scavenge收集器类似ParNew收集器，Parallel收集器更关注系统的吞吐量。可以通过参数来打开自适应调节策略，虚拟机会根据当前系统的运行情况收集性能监控信息，动态调整这些参数以提供最合适的停顿时间或最大的吞吐量；也可以通过参数控制GC的时间不大于多少毫秒或者比例；新生代复制算法、老年代标记-压缩</p>
+<p>参数控制： <code>-XX:+UseParallelGC</code> 使用Parallel收集器+
+老年代串行</p>
+<h3 id="parallel-old-收集器">Parallel Old 收集器</h3>
+<p>Parallel Old是Parallel
+Scavenge收集器的老年代版本，使用多线程和“标记－整理”算法。这个收集器是在JDK
+1.6中才开始提供</p>
+<p>参数控制： <code>-XX:+UseParallelOldGC</code> 使用Parallel收集器+
+老年代并行</p>
+<h3 id="cms收集器">CMS收集器</h3>
+<p>CMS（Concurrent Mark
+Sweep）收集器是一种以获取最短回收停顿时间为目标的收集器。目前很大一部分的Java应用都集中在互联网站或B/S系统的服务端上，这类应用尤其重视服务的响应速度，希望系统停顿时间最短，以给用户带来较好的体验。</p>
+<p>从名字（包含“Mark
+Sweep”）上就可以看出CMS收集器是基于“标记-清除”算法实现的，它的运作过程相对于前面几种收集器来说要更复杂一些，整个过程分为4个步骤，包括：</p>
 <ul>
 <li>初始标记（CMS initial mark）</li>
 <li>并发标记（CMS concurrent mark）</li>
 <li>重新标记（CMS remark）</li>
 <li>并发清除（CMS concurrent sweep）</li>
 </ul>
-<p>其中初始标记、重新标记这两个步骤仍然需要“Stop The World”。初始标记仅仅只是标记一下GC Roots能直接关联到的对象，速度很快，并发标记阶段就是进行GC Roots Tracing的过程，而重新标记阶段则是为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长一些，但远比并发标记的时间短。</p>
+<p>其中初始标记、重新标记这两个步骤仍然需要“Stop The
+World”。初始标记仅仅只是标记一下GC
+Roots能直接关联到的对象，速度很快，并发标记阶段就是进行GC Roots
+Tracing的过程，而重新标记阶段则是为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间一般会比初始标记阶段稍长一些，但远比并发标记的时间短。</p>
 <p>由于整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，所以总体上来说，CMS收集器的内存回收过程是与用户线程一起并发地执行。老年代收集器（新生代使用ParNew）</p>
-<p><strong>优点</strong>: 并发收集、低停顿<br><strong>缺点</strong>: 产生大量空间碎片、并发阶段会降低吞吐量</p>
+<p><strong>优点</strong>: 并发收集、低停顿 <strong>缺点</strong>:
+产生大量空间碎片、并发阶段会降低吞吐量</p>
 <p>参数控制：</p>
-<p><code>-XX:+UseConcMarkSweepGC</code> 使用CMS收集器<br><code>-XX:+ UseCMSCompactAtFullCollection</code> Full GC后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长<br><code>-XX:+CMSFullGCsBeforeCompaction</code> 设置进行几次Full GC后，进行一次碎片整理<br><code>-XX:ParallelCMSThreads</code> 设定CMS的线程数量（一般情况约等于可用CPU数量）</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702124017.png" alt="微信截图_20230702124017"></p>
-<h3 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h3><p>G1是目前技术发展的最前沿成果之一，HotSpot开发团队赋予它的使命是未来可以替换掉JDK1.5中发布的CMS收集器。与CMS收集器相比G1收集器有以下特点：</p>
-<ol>
+<p><code>-XX:+UseConcMarkSweepGC</code> 使用CMS收集器
+<code>-XX:+ UseCMSCompactAtFullCollection</code> Full
+GC后，进行一次碎片整理；整理过程是独占的，会引起停顿时间变长
+<code>-XX:+CMSFullGCsBeforeCompaction</code> 设置进行几次Full
+GC后，进行一次碎片整理 <code>-XX:ParallelCMSThreads</code>
+设定CMS的线程数量（一般情况约等于可用CPU数量）</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124017.png" alt="微信截图_20230702124017">
+<figcaption aria-hidden="true">微信截图_20230702124017</figcaption>
+</figure>
+<h3 id="g1收集器">G1收集器</h3>
+<p>G1是目前技术发展的最前沿成果之一，HotSpot开发团队赋予它的使命是未来可以替换掉JDK1.5中发布的CMS收集器。与CMS收集器相比G1收集器有以下特点：</p>
+<ol type="1">
 <li><strong>空间整合</strong>，G1收集器采用标记整理算法，不会产生内存空间碎片。分配大对象时不会因为无法找到连续空间而提前触发下一次GC。</li>
 <li><strong>可预测停顿</strong>，这是G1的另一大优势，降低停顿时间是G1和CMS的共同关注点，但G1除了追求低停顿外，还能建立可预测的停顿时间模型，能让使用者明确指定在一个长度为N毫秒的时间片段内，消耗在垃圾收集上的时间不得超过N毫秒，这几乎已经是实时Java（RTSJ）的垃圾收集器的特征了。</li>
 </ol>
 <p>上面提到的垃圾收集器，收集的范围都是整个新生代或者老年代，而G1不再是这样。使用G1收集器时，Java堆的内存布局与其他收集器有很大差别，它将整个Java堆划分为多个大小相等的独立区域（Region），虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔阂了，它们都是一部分（可以不连续）Region的集合。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702124101.png" alt="微信截图_20230702124101"></p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124101.png" alt="微信截图_20230702124101">
+<figcaption aria-hidden="true">微信截图_20230702124101</figcaption>
+</figure>
 <p>G1的新生代收集跟ParNew类似，当新生代占用达到一定比例的时候，开始出发收集。和CMS类似，G1收集器收集老年代对象会有短暂停顿。</p>
 <p>收集步骤：</p>
-<p>1、标记阶段，首先初始标记(Initial-Mark),这个阶段是停顿的(Stop the World Event)，并且会触发一次普通Mintor GC。对应GC log:GC pause (young) (inital-mark)</p>
-<p>2、Root Region Scanning，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young GC之前完成。</p>
-<p>3、Concurrent Marking，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702124135.png" alt="微信截图_20230702124135"></p>
-<p>4、Remark, 再标记，会有短暂停顿(STW)。再标记阶段是用来收集 并发标记阶段 产生新的垃圾(并发阶段和应用程序一同运行)；G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning (SATB)。</p>
-<p>5、Copy&#x2F;Clean up，多线程清除失活对象，会有STW。G1将回收区域的存活对象拷贝到新区域，清除Remember Sets，并发清空回收区域并把它返回到空闲区域链表中。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702124210.png" alt="微信截图_20230702124210"></p>
-<p>6、复制&#x2F;清除过程后。回收区域的活性对象已经被集中回收到深蓝色和深绿色区域。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702124248.png" alt="微信截图_20230702124248"></p>
-<h2 id="常用的收集器组合"><a href="#常用的收集器组合" class="headerlink" title="常用的收集器组合"></a>常用的收集器组合</h2><table>
+<p>1、标记阶段，首先初始标记(Initial-Mark),这个阶段是停顿的(Stop the
+World Event)，并且会触发一次普通Mintor GC。对应GC log:GC pause (young)
+(inital-mark)</p>
+<p>2、Root Region
+Scanning，程序运行过程中会回收survivor区(存活到老年代)，这一过程必须在young
+GC之前完成。</p>
+<p>3、Concurrent
+Marking，在整个堆中进行并发标记(和应用程序并发执行)，此过程可能被young
+GC中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那个这个区域会被立即回收(图中打X)。同时，并发标记过程中，会计算每个区域的对象活性(区域中存活对象的比例)。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124135.png" alt="微信截图_20230702124135">
+<figcaption aria-hidden="true">微信截图_20230702124135</figcaption>
+</figure>
+<p>4、Remark, 再标记，会有短暂停顿(STW)。再标记阶段是用来收集
+并发标记阶段
+产生新的垃圾(并发阶段和应用程序一同运行)；G1中采用了比CMS更快的初始快照算法:snapshot-at-the-beginning
+(SATB)。</p>
+<p>5、Copy/Clean
+up，多线程清除失活对象，会有STW。G1将回收区域的存活对象拷贝到新区域，清除Remember
+Sets，并发清空回收区域并把它返回到空闲区域链表中。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124210.png" alt="微信截图_20230702124210">
+<figcaption aria-hidden="true">微信截图_20230702124210</figcaption>
+</figure>
+<p>6、复制/清除过程后。回收区域的活性对象已经被集中回收到深蓝色和深绿色区域。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%89)GC%E7%AE%97%E6%B3%95%20%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8//微信截图_20230702124248.png" alt="微信截图_20230702124248">
+<figcaption aria-hidden="true">微信截图_20230702124248</figcaption>
+</figure>
+<h2 id="常用的收集器组合">常用的收集器组合</h2>
+<table>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 14%">
+<col style="width: 62%">
+</colgroup>
 <thead>
-<tr>
-<th align="left"></th>
-<th align="left">新生代GC策略</th>
-<th align="left">老年老代GC策略</th>
-<th align="left">说明</th>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">新生代GC策略</th>
+<th style="text-align: left;">老年老代GC策略</th>
+<th style="text-align: left;">说明</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="left">组合1</td>
-<td align="left">Serial</td>
-<td align="left">Serial Old</td>
-<td align="left">Serial和Serial Old都是单线程进行GC，特点就是GC时暂停所有应用线程。</td>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">组合1</td>
+<td style="text-align: left;">Serial</td>
+<td style="text-align: left;">Serial Old</td>
+<td style="text-align: left;">Serial和Serial
+Old都是单线程进行GC，特点就是GC时暂停所有应用线程。</td>
 </tr>
-<tr>
-<td align="left">组合2</td>
-<td align="left">Serial</td>
-<td align="left">CMS+Serial Old</td>
-<td align="left">CMS（Concurrent Mark Sweep）是并发GC，实现GC线程和应用线程并发工作，不需要暂停所有应用线程。另外，当CMS进行GC失败时，会自动使用Serial Old策略进行GC。</td>
+<tr class="even">
+<td style="text-align: left;">组合2</td>
+<td style="text-align: left;">Serial</td>
+<td style="text-align: left;">CMS+Serial Old</td>
+<td style="text-align: left;">CMS（Concurrent Mark
+Sweep）是并发GC，实现GC线程和应用线程并发工作，不需要暂停所有应用线程。另外，当CMS进行GC失败时，会自动使用Serial
+Old策略进行GC。</td>
 </tr>
-<tr>
-<td align="left">组合3</td>
-<td align="left">ParNew</td>
-<td align="left">CMS</td>
-<td align="left">使用 <code>-XX:+UseParNewGC</code>选项来开启。ParNew是Serial的并行版本，可以指定GC线程数，默认GC线程数为CPU的数量。可以使用-XX:ParallelGCThreads选项指定GC的线程数。如果指定了选项 <code>-XX:+UseConcMarkSweepGC</code>选项，则新生代默认使用ParNew GC策略。</td>
+<tr class="odd">
+<td style="text-align: left;">组合3</td>
+<td style="text-align: left;">ParNew</td>
+<td style="text-align: left;">CMS</td>
+<td style="text-align: left;">使用
+<code>-XX:+UseParNewGC</code>选项来开启。ParNew是Serial的并行版本，可以指定GC线程数，默认GC线程数为CPU的数量。可以使用-XX:ParallelGCThreads选项指定GC的线程数。如果指定了选项
+<code>-XX:+UseConcMarkSweepGC</code>选项，则新生代默认使用ParNew
+GC策略。</td>
 </tr>
-<tr>
-<td align="left">组合4</td>
-<td align="left">ParNew</td>
-<td align="left">Serial Old</td>
-<td align="left">使用 <code>-XX:+UseParNewGC</code>选项来开启。新生代使用ParNew GC策略，年老代默认使用Serial Old GC策略。</td>
+<tr class="even">
+<td style="text-align: left;">组合4</td>
+<td style="text-align: left;">ParNew</td>
+<td style="text-align: left;">Serial Old</td>
+<td style="text-align: left;">使用
+<code>-XX:+UseParNewGC</code>选项来开启。新生代使用ParNew
+GC策略，年老代默认使用Serial Old GC策略。</td>
 </tr>
-<tr>
-<td align="left">组合5</td>
-<td align="left">Parallel Scavenge</td>
-<td align="left">Serial Old</td>
-<td align="left">Parallel Scavenge策略主要是关注一个可控的吞吐量：应用程序运行时间 &#x2F; (应用程序运行时间 + GC时间)，可见这会使得CPU的利用率尽可能的高，适用于后台持久运行的应用程序，而不适用于交互较多的应用程序。</td>
+<tr class="odd">
+<td style="text-align: left;">组合5</td>
+<td style="text-align: left;">Parallel Scavenge</td>
+<td style="text-align: left;">Serial Old</td>
+<td style="text-align: left;">Parallel
+Scavenge策略主要是关注一个可控的吞吐量：应用程序运行时间 /
+(应用程序运行时间 +
+GC时间)，可见这会使得CPU的利用率尽可能的高，适用于后台持久运行的应用程序，而不适用于交互较多的应用程序。</td>
 </tr>
-<tr>
-<td align="left">组合6</td>
-<td align="left">Parallel Scavenge</td>
-<td align="left">Parallel Old</td>
-<td align="left">Parallel Old是Serial Old的并行版本</td>
+<tr class="even">
+<td style="text-align: left;">组合6</td>
+<td style="text-align: left;">Parallel Scavenge</td>
+<td style="text-align: left;">Parallel Old</td>
+<td style="text-align: left;">Parallel Old是Serial Old的并行版本</td>
 </tr>
-<tr>
-<td align="left">组合7</td>
-<td align="left">G1GC</td>
-<td align="left">G1GC</td>
-<td align="left"><code>-XX:+UnlockExperimentalVMOptions</code> <code>-XX:+UseG1GC</code> #开启； <code>-XX:MaxGCPauseMillis=50</code> #暂停时间目标； <code>-XX:GCPauseIntervalMillis=200</code> #暂停间隔目标； <code>-XX:+G1YoungGenSize=512m</code> #年轻代大小； <code>-XX:SurvivorRatio=6</code> #幸存区比例</td>
+<tr class="odd">
+<td style="text-align: left;">组合7</td>
+<td style="text-align: left;">G1GC</td>
+<td style="text-align: left;">G1GC</td>
+<td style="text-align: left;"><code>-XX:+UnlockExperimentalVMOptions</code>
+<code>-XX:+UseG1GC</code> #开启； <code>-XX:MaxGCPauseMillis=50</code>
+#暂停时间目标； <code>-XX:GCPauseIntervalMillis=200</code>
+#暂停间隔目标； <code>-XX:+G1YoungGenSize=512m</code> #年轻代大小；
+<code>-XX:SurvivorRatio=6</code> #幸存区比例</td>
 </tr>
-</tbody></table>
-	  
-
-	  <div>
-  		<center>
-		  <div class="pagination">
-<ul class="pagination">
-	
-	
-	
-	
-	
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-			
-			
-		
-	
-		
-			
-			
-			
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-	
-	
-		<li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
-	
-	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
-	
-		<li class="next"><a href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%8C)JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
-	
-</ul>
-</div>
-
-		</center>
-	  </div>
-	  
-	</div> <!-- col-md-9/col-md-12 -->
-	
-  </div><!-- row -->
-
-	</div>
-  </div>
-  <div class="container-narrow">
-	<footer> <p>
-  &copy; 2023 albert dong
-  
-      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Please inform us of any infringement by 517916466@qq.com
-</p> </footer>
-  </div> <!-- container-narrow -->
-  
-<a id="gotop" href="#">   
-  <span>▲</span> 
-</a>
-
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.tableofcontents.min.js"></script>
-<script src="/js/tocgenerator.min.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/search.js"></script> 
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-(function($){
-  $('.fancybox').fancybox();
-})(jQuery);
-</script>
-
-
-
-
-</body>
-</html>
+</tbody>
+</table>
+</div><div class="article-licensing box"><div class="licensing-title"><p>jvm系列(三):GC算法 垃圾收集器</p><p><a href="https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(三)GC算法 垃圾收集器/">https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(三)GC算法 垃圾收集器/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2022-03-11</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-07-02</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="../../../../../../2023/05/10/%E6%95%B0%E6%8D%AE%E5%BA%93/graphdatabase/%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93nebulaGraph%E9%80%89%E5%9E%8B/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">图数据库nebulaGraph选型</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%8C)JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/"><span class="level-item">jvm系列(二):JVM内存结构</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#jvm系列三gc算法-垃圾收集器"><span class="level-left"><span class="level-item">1</span><span class="level-item">jvm系列(三):GC算法 垃圾收集器</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#概述"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">概述</span></span></a></li><li><a class="level is-mobile" href="#对象存活判断"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">对象存活判断</span></span></a></li><li><a class="level is-mobile" href="#垃圾收集算法"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">垃圾收集算法</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#标记--清除算法"><span class="level-left"><span class="level-item">1.3.1</span><span class="level-item">标记 -清除算法</span></span></a></li><li><a class="level is-mobile" href="#复制算法"><span class="level-left"><span class="level-item">1.3.2</span><span class="level-item">复制算法</span></span></a></li><li><a class="level is-mobile" href="#标记-压缩算法"><span class="level-left"><span class="level-item">1.3.3</span><span class="level-item">标记-压缩算法</span></span></a></li><li><a class="level is-mobile" href="#分代收集算法"><span class="level-left"><span class="level-item">1.3.4</span><span class="level-item">分代收集算法</span></span></a></li></ul></li><li><a class="level is-mobile" href="#垃圾收集器"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">垃圾收集器</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#serial收集器"><span class="level-left"><span class="level-item">1.4.1</span><span class="level-item">Serial收集器</span></span></a></li><li><a class="level is-mobile" href="#parallel收集器"><span class="level-left"><span class="level-item">1.4.2</span><span class="level-item">Parallel收集器</span></span></a></li><li><a class="level is-mobile" href="#parallel-old-收集器"><span class="level-left"><span class="level-item">1.4.3</span><span class="level-item">Parallel Old 收集器</span></span></a></li><li><a class="level is-mobile" href="#cms收集器"><span class="level-left"><span class="level-item">1.4.4</span><span class="level-item">CMS收集器</span></span></a></li><li><a class="level is-mobile" href="#g1收集器"><span class="level-left"><span class="level-item">1.4.5</span><span class="level-item">G1收集器</span></span></a></li></ul></li><li><a class="level is-mobile" href="#常用的收集器组合"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">常用的收集器组合</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="../../../../../../2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="../../../../../../2023/06/17/%E6%B6%88%E6%81%AF/kafka/">kafka</a></p><p class="categories"><a href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../../../../2023/06/05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="../../../../../../js/column.js"></script><script src="../../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"../../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>

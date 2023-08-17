@@ -1,242 +1,210 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  <title>jvm系列(五):Java GC 分析 | blog</title>
-  <meta name="author" content="albert dong">
-  
-  <meta name="description" content="jvm系列(五):Java GC 分析Java GC就是JVM记录仪，书画了JVM各个分区的表演
-什么是 Java GCJava GC（Garbage Collection，垃圾收集，垃圾回收）机制，是Java与C++&amp;#x2F;C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾">
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>jvm系列(五):Java GC 分析 - blog</title><link rel="manifest" href="../../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="jvm系列(五):Java GC 分析 Java GC就是JVM记录仪，书画了JVM各个分区的表演 什么是 Java GC Java GC（Garbage Collection，垃圾收集，垃圾回收）机制，是Java与C++&amp;#x2F;C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾清理代码，对内存泄露和溢出的问题，也不需要像C程序员那样战战兢兢。这是因为在Java虚拟机中，存在"><meta property="og:type" content="blog"><meta property="og:title" content="jvm系列(五):Java GC 分析"><meta property="og:url" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90/"><meta property="og:site_name" content="blog"><meta property="og:description" content="jvm系列(五):Java GC 分析 Java GC就是JVM记录仪，书画了JVM各个分区的表演 什么是 Java GC Java GC（Garbage Collection，垃圾收集，垃圾回收）机制，是Java与C++&amp;#x2F;C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾清理代码，对内存泄露和溢出的问题，也不需要像C程序员那样战战兢兢。这是因为在Java虚拟机中，存在"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702125921.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130000.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130036.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130112.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130156.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130237.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130259.png"><meta property="article:published_time" content="2022-03-10T18:45:12.000Z"><meta property="article:modified_time" content="2023-07-02T05:37:26.737Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702125921.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90/"},"headline":"jvm系列(五):Java GC 分析","image":["https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702125921.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130000.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130036.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130112.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130156.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130237.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130259.png"],"datePublished":"2022-03-10T18:45:12.000Z","dateModified":"2023-07-02T05:37:26.737Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"jvm系列(五):Java GC 分析\r Java GC就是JVM记录仪，书画了JVM各个分区的表演\r 什么是 Java GC\r Java GC（Garbage\r Collection，垃圾收集，垃圾回收）机制，是Java与C++&#x2F;C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾清理代码，对内存泄露和溢出的问题，也不需要像C程序员那样战战兢兢。这是因为在Java虚拟机中，存在"}</script><link rel="canonical" href="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90/"><link rel="icon" href="../../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
 
-  <meta property="og:title" content="jvm系列(五):Java GC 分析"/>
-  <meta property="og:site_name" content="blog"/>
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
 
-  
-    <meta property="og:image" content=""/>
-  
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
 
-  
-    <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
-  
-  
-    <link href="/favicon.png" rel="icon">
-  
-  
-  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
-  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-
-  <script src="/js/jquery-2.0.3.min.js"></script>
-
-  <!-- analytics -->
-  
-
-<meta name="generator" content="Hexo 6.3.0"></head>
-
-<body id="body" data-spy="scroll" data-target=".toc">
-  <div class="container" id="container">
-	<div class="content">
-	  <div class="page-header">		
-  <h1><a class="brand" href="/">blog</a><span class="split"></span><span class="title">jvm系列(五):Java GC 分析</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2022-03-11</span></h1>
-</div>		
-
-<div class="row page">
-  <!-- cols -->	
-  
-  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
-	<!-- toc -->
-<script type="text/javascript">
-		jQuery(document).ready(function() {
- 		   generateWikiTOC('.note', '.toc',  2 , 2 );
-		});
-</script>
-  </div><!-- col-md-3 -->
-  
-  
-
-  
-  <div class="col-xs-12 col-sm-9 col-md-9 note">
-	
-
-	  <!-- content -->
-	  <h1 id="jvm系列-五-Java-GC-分析"><a href="#jvm系列-五-Java-GC-分析" class="headerlink" title="jvm系列(五):Java GC 分析"></a>jvm系列(五):Java GC 分析</h1><p>Java GC就是JVM记录仪，书画了JVM各个分区的表演</p>
-<h2 id="什么是-Java-GC"><a href="#什么是-Java-GC" class="headerlink" title="什么是 Java GC"></a>什么是 Java GC</h2><p>Java GC（Garbage Collection，垃圾收集，垃圾回收）机制，是Java与C++&#x2F;C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾清理代码，对内存泄露和溢出的问题，也不需要像C程序员那样战战兢兢。这是因为在Java虚拟机中，存在自动内存管理和垃圾清扫机制。概括地说，该机制对JVM（Java Virtual Machine）中的内存进行标记，并确定哪些内存需要回收，根据一定的回收策略，自动的回收内存，永不停息（Nerver Stop）的保证JVM中的内存空间，防止出现内存泄露和溢出问题。</p>
-<p>在Java语言出现之前，就有GC机制的存在，如Lisp语言），Java GC机制已经日臻完善，几乎可以自动的为我们做绝大多数的事情。然而，如果我们从事较大型的应用软件开发，曾经出现过内存优化的需求，就必定要研究Java GC机制。</p>
-<p>简单总结一下，Java GC就是通过GC收集器回收不在存活的对象，保证JVM更加高效的运转。如果不了解GC算法和垃圾回收器可以参考这篇文章：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI4NDY5Mjc1Mg==&mid=2247483952&idx=1&sn=ea12792a9b7c67baddfaf425d8272d33&chksm=ebf6da4fdc815359869107a4acd15538b3596ba006b4005b216688b69372650dbd18c0184643&scene=21#wechat_redirect">jvm系列(三):GC算法 垃圾收集器。</a></p>
-<h2 id="如何获取-Java-GC日志"><a href="#如何获取-Java-GC日志" class="headerlink" title="如何获取 Java GC日志"></a>如何获取 Java GC日志</h2><p>一般情况可以通过两种方式来获取GC日志，一种是使用命令动态查看，一种是在容器中设置相关参数打印GC日志。</p>
-<h3 id="命令动态查看"><a href="#命令动态查看" class="headerlink" title="命令动态查看"></a>命令动态查看</h3><p>Java 自动的工具行命令，jstat可以用来动态监控JVM内存的使用，统计垃圾回收的各项信息。</p>
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2022-03-10T18:45:12.000Z" title="2022/3/11 02:45:12">2022-03-11</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-07-02T05:37:26.737Z" title="2023/7/2 13:37:26">2023-07-02</time></span><span class="level-item"><a class="link-muted" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/">JVM调优合集</a></span><span class="level-item">13 minutes read (About 1916 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">jvm系列(五):Java GC 分析</h1><div class="content"><h1 id="jvm系列五java-gc-分析">jvm系列(五):Java GC 分析</h1>
+<p>Java GC就是JVM记录仪，书画了JVM各个分区的表演</p>
+<h2 id="什么是-java-gc">什么是 Java GC</h2>
+<p>Java GC（Garbage
+Collection，垃圾收集，垃圾回收）机制，是Java与C++/C的主要区别之一，作为Java开发者，一般不需要专门编写内存回收和垃圾清理代码，对内存泄露和溢出的问题，也不需要像C程序员那样战战兢兢。这是因为在Java虚拟机中，存在自动内存管理和垃圾清扫机制。概括地说，该机制对JVM（Java
+Virtual
+Machine）中的内存进行标记，并确定哪些内存需要回收，根据一定的回收策略，自动的回收内存，永不停息（Nerver
+Stop）的保证JVM中的内存空间，防止出现内存泄露和溢出问题。</p>
+<p>在Java语言出现之前，就有GC机制的存在，如Lisp语言），Java
+GC机制已经日臻完善，几乎可以自动的为我们做绝大多数的事情。然而，如果我们从事较大型的应用软件开发，曾经出现过内存优化的需求，就必定要研究Java
+GC机制。</p>
+<p>简单总结一下，Java
+GC就是通过GC收集器回收不在存活的对象，保证JVM更加高效的运转。如果不了解GC算法和垃圾回收器可以参考这篇文章：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI4NDY5Mjc1Mg==&amp;mid=2247483952&amp;idx=1&amp;sn=ea12792a9b7c67baddfaf425d8272d33&amp;chksm=ebf6da4fdc815359869107a4acd15538b3596ba006b4005b216688b69372650dbd18c0184643&amp;scene=21#wechat_redirect">jvm系列(三):GC算法
+垃圾收集器。</a></p>
+<h2 id="如何获取-java-gc日志">如何获取 Java GC日志</h2>
+<p>一般情况可以通过两种方式来获取GC日志，一种是使用命令动态查看，一种是在容器中设置相关参数打印GC日志。</p>
+<h3 id="命令动态查看">命令动态查看</h3>
+<p>Java
+自动的工具行命令，jstat可以用来动态监控JVM内存的使用，统计垃圾回收的各项信息。</p>
 <p>比如常用命令， <code>jstat-gc</code> 统计垃圾回收堆的行为</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gc 1262 S0C    S1C     S0U     S1U   EC       EU        OC         OU        PC       PU         YGC    YGCT    FGC    FGCT     GCT   26112.0 24064.0 6562.5  0.0   564224.0 76274.5   434176.0   388518.3  524288.0 42724.7    320    6.417   1      0.398    6.815</span><br></pre></td></tr></table></figure>
-
 <p>也可以设置间隔固定时间来打印：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gc 1262 2000 20</span><br></pre></td></tr></table></figure>
-
 <p>这个命令意思就是每隔2000ms输出1262的gc情况，一共输出20次</p>
-<p>更详细的内容参考这篇文章：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI4NDY5Mjc1Mg==&mid=2247483966&idx=1&sn=dfa3375d36aa2c0c25a775522e381e62&chksm=ebf6da41dc815357e0d53c73865a23f41219e75bac5a4d510bfa31cc51594b59a20e2e4f6cb8&scene=21#wechat_redirect">jvm系列(四):jvm调优-命令篇</a></p>
-<h3 id="GC参数"><a href="#GC参数" class="headerlink" title="GC参数"></a>GC参数</h3><p>JVM的GC日志的主要参数包括如下几个：</p>
+<p>更详细的内容参考这篇文章：<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MzI4NDY5Mjc1Mg==&amp;mid=2247483966&amp;idx=1&amp;sn=dfa3375d36aa2c0c25a775522e381e62&amp;chksm=ebf6da41dc815357e0d53c73865a23f41219e75bac5a4d510bfa31cc51594b59a20e2e4f6cb8&amp;scene=21#wechat_redirect">jvm系列(四):jvm调优-命令篇</a></p>
+<h3 id="gc参数">GC参数</h3>
+<p>JVM的GC日志的主要参数包括如下几个：</p>
 <ul>
 <li><code>-XX:+PrintGC</code> 输出GC日志</li>
 <li><code>-XX:+PrintGCDetails</code> 输出GC的详细日志</li>
-<li><code>-XX:+PrintGCTimeStamps</code> 输出GC的时间戳（以基准时间的形式）</li>
-<li><code>-XX:+PrintGCDateStamps</code> 输出GC的时间戳（以日期的形式，如 2017-09-04T21:53:59.234+0800）</li>
+<li><code>-XX:+PrintGCTimeStamps</code>
+输出GC的时间戳（以基准时间的形式）</li>
+<li><code>-XX:+PrintGCDateStamps</code> 输出GC的时间戳（以日期的形式，如
+2017-09-04T21:53:59.234+0800）</li>
 <li><code>-XX:+PrintHeapAtGC</code> 在进行GC的前后打印出堆的信息</li>
 <li><code>-Xloggc:../logs/gc.log</code> 日志文件的输出路径</li>
 </ul>
 <p>在生产环境中，根据需要配置相应的参数来监控JVM运行情况。</p>
-<h3 id="Tomcat-设置示例"><a href="#Tomcat-设置示例" class="headerlink" title="Tomcat 设置示例"></a>Tomcat 设置示例</h3><p>我们经常在tomcat的启动参数中添加JVM相关参数，这里有一个典型的示例：</p>
+<h3 id="tomcat-设置示例">Tomcat 设置示例</h3>
+<p>我们经常在tomcat的启动参数中添加JVM相关参数，这里有一个典型的示例：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JAVA_OPTS=&quot;-server -Xms2000m -Xmx2000m -Xmn800m -XX:PermSize=64m -XX:MaxPermSize=256m -XX:SurvivorRatio=4-verbose:gc -Xloggc:$CATALINA_HOME/logs/gc.log -Djava.awt.headless=true -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Dsun.rmi.dgc.server.gcInterval=600000 -Dsun.rmi.dgc.client.gcInterval=600000-XX:+UseConcMarkSweepGC -XX:MaxTenuringThreshold=15&quot;</span><br></pre></td></tr></table></figure>
-
 <p>根据上面的参数我们来做一下解析：</p>
-<p><code>-Xms2000m-Xmx2000m-Xmn800m-XX:PermSize=64m-XX:MaxPermSize=256m</code><br>Xms，即为jvm启动时得JVM初始堆大小,Xmx为jvm的最大堆大小，xmn为新生代的大小，permsize为永久代的初始大小，MaxPermSize为永久代的最大空间。</p>
-<p><code>-XX:SurvivorRatio=4</code><br>SurvivorRatio为新生代空间中的Eden区和救助空间Survivor区的大小比值，默认是32，也就是说Eden区是 Survivor区的32倍大小，要注意Survivo是有两个区的，因此Surivivor其实占整个young genertation的1&#x2F;34。调小这个参数将增大survivor区，让对象尽量在survitor区呆长一点，减少进入年老代的对象。去掉救助空间的想法是让大部分不能马上回收的数据尽快进入年老代，加快年老代的回收频率，减少年老代暴涨的可能性，这个是通过将-XX:SurvivorRatio 设置成比较大的值（比如65536)来做到。</p>
-<p><code>-verbose:gc-Xloggc:$CATALINA_HOME/logs/gc.log</code><br>将虚拟机每次垃圾回收的信息写到日志文件中，文件名由file指定，文件格式是平文件，内容和-verbose:gc输出内容相同。</p>
-<p><code>-Djava.awt.headless=true</code> Headless模式是系统的一种配置模式。在该模式下，系统缺少了显示设备、键盘或鼠标。</p>
-<p><code>-XX:+PrintGCTimeStamps-XX:+PrintGCDetails</code><br>设置gc日志的格式</p>
-<p><code>-Dsun.rmi.dgc.server.gcInterval=600000-Dsun.rmi.dgc.client.gcInterval=600000</code><br>指定rmi调用时gc的时间间隔</p>
-<p><code>-XX:+UseConcMarkSweepGC-XX:MaxTenuringThreshold=15</code> 采用并发gc方式，经过15次minor gc 后进入年老代</p>
-<h2 id="如何分析GC日志"><a href="#如何分析GC日志" class="headerlink" title="如何分析GC日志"></a>如何分析GC日志</h2><p>摘录GC日志一部分</p>
+<p><code>-Xms2000m-Xmx2000m-Xmn800m-XX:PermSize=64m-XX:MaxPermSize=256m</code>
+Xms，即为jvm启动时得JVM初始堆大小,Xmx为jvm的最大堆大小，xmn为新生代的大小，permsize为永久代的初始大小，MaxPermSize为永久代的最大空间。</p>
+<p><code>-XX:SurvivorRatio=4</code>
+SurvivorRatio为新生代空间中的Eden区和救助空间Survivor区的大小比值，默认是32，也就是说Eden区是
+Survivor区的32倍大小，要注意Survivo是有两个区的，因此Surivivor其实占整个young
+genertation的1/34。调小这个参数将增大survivor区，让对象尽量在survitor区呆长一点，减少进入年老代的对象。去掉救助空间的想法是让大部分不能马上回收的数据尽快进入年老代，加快年老代的回收频率，减少年老代暴涨的可能性，这个是通过将-XX:SurvivorRatio
+设置成比较大的值（比如65536)来做到。</p>
+<p><code>-verbose:gc-Xloggc:$CATALINA_HOME/logs/gc.log</code>
+将虚拟机每次垃圾回收的信息写到日志文件中，文件名由file指定，文件格式是平文件，内容和-verbose:gc输出内容相同。</p>
+<p><code>-Djava.awt.headless=true</code>
+Headless模式是系统的一种配置模式。在该模式下，系统缺少了显示设备、键盘或鼠标。</p>
+<p><code>-XX:+PrintGCTimeStamps-XX:+PrintGCDetails</code>
+设置gc日志的格式</p>
+<p><code>-Dsun.rmi.dgc.server.gcInterval=600000-Dsun.rmi.dgc.client.gcInterval=600000</code>
+指定rmi调用时gc的时间间隔</p>
+<p><code>-XX:+UseConcMarkSweepGC-XX:MaxTenuringThreshold=15</code>
+采用并发gc方式，经过15次minor gc 后进入年老代</p>
+<h2 id="如何分析gc日志">如何分析GC日志</h2>
+<p>摘录GC日志一部分</p>
 <p>Young GC回收日志:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2016-07-05T10:43:18.093+0800: 25.395: [GC [PSYoungGen: 274931K-&gt;10738K(274944K)] 371093K-&gt;147186K(450048K), 0.0668480 secs] [Times: user=0.17 sys=0.08, real=0.07 secs]</span><br></pre></td></tr></table></figure>
-
 <p>Full GC回收日志:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2016-07-05T10:43:18.160+0800: 25.462: [Full GC [PSYoungGen: 10738K-&gt;0K(274944K)] [ParOldGen: 136447K-&gt;140379K(302592K)] 147186K-&gt;140379K(577536K) [PSPermGen: 85411K-&gt;85376K(171008K)], 0.6763541 secs] [Times: user=1.75 sys=0.02, real=0.68 secs]</span><br></pre></td></tr></table></figure>
-
-<p>通过上面日志分析得出，PSYoungGen、ParOldGen、PSPermGen属于Parallel收集器。其中PSYoungGen表示gc回收前后年轻代的内存变化；ParOldGen表示gc回收前后老年代的内存变化；PSPermGen表示gc回收前后永久区的内存变化。young gc 主要是针对年轻代进行内存回收比较频繁，耗时短；full gc 会对整个堆内存进行回城，耗时长，因此一般尽量减少full gc的次数</p>
+<p>通过上面日志分析得出，PSYoungGen、ParOldGen、PSPermGen属于Parallel收集器。其中PSYoungGen表示gc回收前后年轻代的内存变化；ParOldGen表示gc回收前后老年代的内存变化；PSPermGen表示gc回收前后永久区的内存变化。young
+gc 主要是针对年轻代进行内存回收比较频繁，耗时短；full gc
+会对整个堆内存进行回城，耗时长，因此一般尽量减少full gc的次数</p>
 <p>通过两张图非常明显看出gc日志构成：</p>
-<p>Young GC日志: </p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702125921.png" alt="微信截图_20230702125921"></p>
+<p>Young GC日志:</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702125921.png" alt="微信截图_20230702125921">
+<figcaption aria-hidden="true">微信截图_20230702125921</figcaption>
+</figure>
 <p>Full GC日志:</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130000.png" alt="微信截图_20230702130000"></p>
-<h2 id="GC分析工具"><a href="#GC分析工具" class="headerlink" title="GC分析工具"></a>GC分析工具</h2><h3 id="GChisto"><a href="#GChisto" class="headerlink" title="GChisto"></a>GChisto</h3><p>GChisto是一款专业分析gc日志的工具，可以通过gc日志来分析：Minor GC、full gc的时间、频率等等，通过列表、报表、图表等不同的形式来反应gc的情况。虽然界面略显粗糙，但是功能还是不错的。</p>
-<p>配置好本地的jdk环境之后，双击GChisto.jar,在弹出的输入框中点击 add 选择gc.log日志</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130036.png" alt="微信截图_20230702130036"></p>
-<p>GC Pause Stats:可以查看GC 的次数、GC的时间、GC的开销、最大GC时间和最小GC时间等，以及相应的柱状图</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130112.png" alt="微信截图_20230702130112"></p>
-<p>GC Pause Distribution:查看GC停顿的详细分布，x轴表示垃圾收集停顿时间，y轴表示是停顿次数。</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130000.png" alt="微信截图_20230702130000">
+<figcaption aria-hidden="true">微信截图_20230702130000</figcaption>
+</figure>
+<h2 id="gc分析工具">GC分析工具</h2>
+<h3 id="gchisto">GChisto</h3>
+<p>GChisto是一款专业分析gc日志的工具，可以通过gc日志来分析：Minor
+GC、full
+gc的时间、频率等等，通过列表、报表、图表等不同的形式来反应gc的情况。虽然界面略显粗糙，但是功能还是不错的。</p>
+<p>配置好本地的jdk环境之后，双击GChisto.jar,在弹出的输入框中点击 add
+选择gc.log日志</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130036.png" alt="微信截图_20230702130036">
+<figcaption aria-hidden="true">微信截图_20230702130036</figcaption>
+</figure>
+<p>GC Pause Stats:可以查看GC
+的次数、GC的时间、GC的开销、最大GC时间和最小GC时间等，以及相应的柱状图</p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130112.png" alt="微信截图_20230702130112">
+<figcaption aria-hidden="true">微信截图_20230702130112</figcaption>
+</figure>
+<p>GC Pause
+Distribution:查看GC停顿的详细分布，x轴表示垃圾收集停顿时间，y轴表示是停顿次数。</p>
 <p>GC Timeline：显示整个时间线上的垃圾收集</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130156.png" alt="微信截图_20230702130156"></p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130156.png" alt="微信截图_20230702130156">
+<figcaption aria-hidden="true">微信截图_20230702130156</figcaption>
+</figure>
 <p>不过这款工具已经不再维护</p>
-<h3 id="GC-Easy"><a href="#GC-Easy" class="headerlink" title="GC Easy"></a>GC Easy</h3><p>这是一个web工具,在线使用非常方便.</p>
-<p>地址: <a target="_blank" rel="noopener" href="http://gceasy.io/">http://gceasy.io</a></p>
+<h3 id="gc-easy">GC Easy</h3>
+<p>这是一个web工具,在线使用非常方便.</p>
+<p>地址: http://gceasy.io</p>
 <p>进入官网，讲打包好的zip或者gz为后缀的压缩包上传，过一会就会拿到分析结果。</p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130237.png" alt="微信截图_20230702130237"></p>
-<p><img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702130259.png" alt="微信截图_20230702130259"></p>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130237.png" alt="微信截图_20230702130237">
+<figcaption aria-hidden="true">微信截图_20230702130237</figcaption>
+</figure>
+<figure>
+<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90//微信截图_20230702130259.png" alt="微信截图_20230702130259">
+<figcaption aria-hidden="true">微信截图_20230702130259</figcaption>
+</figure>
 <p>推荐使用此工具进行gc分析。</p>
-	  
-
-	  <div>
-  		<center>
-		  <div class="pagination">
-<ul class="pagination">
-	
-	
-	
-	
-	
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-			
-		
-	
-		
-			
-			
-			
-		
-			
-		
-	
-		
-			
-		
-	
-	
-	
-		<li class="prev"><a href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%8C)JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
-	
-	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
-	
-		<li class="next"><a href="../jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
-	
-</ul>
-</div>
-
-		</center>
-	  </div>
-	  
-	</div> <!-- col-md-9/col-md-12 -->
-	
-  </div><!-- row -->
-
-	</div>
-  </div>
-  <div class="container-narrow">
-	<footer> <p>
-  &copy; 2023 albert dong
-  
-      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Please inform us of any infringement by 517916466@qq.com
-</p> </footer>
-  </div> <!-- container-narrow -->
-  
-<a id="gotop" href="#">   
-  <span>▲</span> 
-</a>
-
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.tableofcontents.min.js"></script>
-<script src="/js/tocgenerator.min.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/search.js"></script> 
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-(function($){
-  $('.fancybox').fancybox();
-})(jQuery);
-</script>
-
-
-
-
-</body>
-</html>
+</div><div class="article-licensing box"><div class="licensing-title"><p>jvm系列(五):Java GC 分析</p><p><a href="https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(五)Java GC 分析/">https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(五)Java GC 分析/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2022-03-11</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-07-02</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%8C)JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">jvm系列(二):JVM内存结构</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="../jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87/"><span class="level-item">jvm系列(六):jvm调优-工具篇</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#jvm系列五java-gc-分析"><span class="level-left"><span class="level-item">1</span><span class="level-item">jvm系列(五):Java GC 分析</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#什么是-java-gc"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">什么是 Java GC</span></span></a></li><li><a class="level is-mobile" href="#如何获取-java-gc日志"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">如何获取 Java GC日志</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#命令动态查看"><span class="level-left"><span class="level-item">1.2.1</span><span class="level-item">命令动态查看</span></span></a></li><li><a class="level is-mobile" href="#gc参数"><span class="level-left"><span class="level-item">1.2.2</span><span class="level-item">GC参数</span></span></a></li><li><a class="level is-mobile" href="#tomcat-设置示例"><span class="level-left"><span class="level-item">1.2.3</span><span class="level-item">Tomcat 设置示例</span></span></a></li></ul></li><li><a class="level is-mobile" href="#如何分析gc日志"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">如何分析GC日志</span></span></a></li><li><a class="level is-mobile" href="#gc分析工具"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">GC分析工具</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#gchisto"><span class="level-left"><span class="level-item">1.4.1</span><span class="level-item">GChisto</span></span></a></li><li><a class="level is-mobile" href="#gc-easy"><span class="level-left"><span class="level-item">1.4.2</span><span class="level-item">GC Easy</span></span></a></li></ul></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="../../../../../../2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="../../../../../../2023/06/17/%E6%B6%88%E6%81%AF/kafka/">kafka</a></p><p class="categories"><a href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../../../../2023/06/05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="../../../../../../js/column.js"></script><script src="../../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"../../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>

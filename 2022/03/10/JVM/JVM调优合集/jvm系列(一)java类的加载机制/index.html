@@ -1,74 +1,45 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  <title>jvm系列(一):java类的加载机制 | blog</title>
-  <meta name="author" content="albert dong">
-  
-  <meta name="description" content="一，jvm系列(一):java类的加载机制1、什么是类的加载类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个 java.lang.Class对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的 Class对象， Cl">
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>jvm系列(一):java类的加载机制 - blog</title><link rel="manifest" href="../../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="一，jvm系列(一):java类的加载机制 1、什么是类的加载 类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个 java.lang.Class对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的 Class对象， Class对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结"><meta property="og:type" content="blog"><meta property="og:title" content="jvm系列(一):java类的加载机制"><meta property="og:url" content="https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/"><meta property="og:site_name" content="blog"><meta property="og:description" content="一，jvm系列(一):java类的加载机制 1、什么是类的加载 类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个 java.lang.Class对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的 Class对象， Class对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702120310.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702121042.png"><meta property="article:published_time" content="2022-03-09T18:45:12.000Z"><meta property="article:modified_time" content="2023-07-02T05:31:45.016Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702120310.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/"},"headline":"jvm系列(一):java类的加载机制","image":["https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702120310.png","https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702121042.png"],"datePublished":"2022-03-09T18:45:12.000Z","dateModified":"2023-07-02T05:31:45.016Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"一，jvm系列(一):java类的加载机制\r 1、什么是类的加载\r 类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个\r java.lang.Class对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的\r Class对象，\r Class对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结"}</script><link rel="canonical" href="https://0914ds.github.io/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/"><link rel="icon" href="../../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
 
-  <meta property="og:title" content="jvm系列(一):java类的加载机制"/>
-  <meta property="og:site_name" content="blog"/>
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
 
-  
-    <meta property="og:image" content=""/>
-  
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
 
-  
-    <link rel="alternative" href="/atom.xml" title="blog" type="application/atom+xml">
-  
-  
-    <link href="/favicon.png" rel="icon">
-  
-  
-  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
-  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-
-  <script src="/js/jquery-2.0.3.min.js"></script>
-
-  <!-- analytics -->
-  
-
-<meta name="generator" content="Hexo 6.3.0"></head>
-
-<body id="body" data-spy="scroll" data-target=".toc">
-  <div class="container" id="container">
-	<div class="content">
-	  <div class="page-header">		
-  <h1><a class="brand" href="/">blog</a><span class="split"></span><span class="title">jvm系列(一):java类的加载机制</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2022-03-10</span></h1>
-</div>		
-
-<div class="row page">
-  <!-- cols -->	
-  
-  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
-	<!-- toc -->
-<script type="text/javascript">
-		jQuery(document).ready(function() {
- 		   generateWikiTOC('.note', '.toc',  2 , 2 );
-		});
-</script>
-  </div><!-- col-md-3 -->
-  
-  
-
-  
-  <div class="col-xs-12 col-sm-9 col-md-9 note">
-	
-
-	  <!-- content -->
-	  <h1 id="一，jvm系列-一-java类的加载机制"><a href="#一，jvm系列-一-java类的加载机制" class="headerlink" title="一，jvm系列(一):java类的加载机制"></a>一，jvm系列(一):java类的加载机制</h1><h2 id="1、什么是类的加载"><a href="#1、什么是类的加载" class="headerlink" title="1、什么是类的加载"></a>1、什么是类的加载</h2><p>类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个 <code>java.lang.Class</code>对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的 <code>Class</code>对象， <code>Class</code>对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结构的接口。</p>
-<p><img src="/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702120310.png" alt="微信截图_20230702120310"></p>
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2022-03-09T18:45:12.000Z" title="2022/3/10 02:45:12">2022-03-10</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-07-02T05:31:45.016Z" title="2023/7/2 13:31:45">2023-07-02</time></span><span class="level-item"><a class="link-muted" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/">JVM调优合集</a></span><span class="level-item">34 minutes read (About 5163 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">jvm系列(一):java类的加载机制</h1><div class="content"><h1 id="一jvm系列一java类的加载机制">一，jvm系列(一):java类的加载机制</h1>
+<h2 id="什么是类的加载">1、什么是类的加载</h2>
+<p>类的加载指的是将类的.class文件中的二进制数据读入到内存中，将其放在运行时数据区的方法区内，然后在堆区创建一个
+<code>java.lang.Class</code>对象，用来封装类在方法区内的数据结构。类的加载的最终产品是位于堆区中的
+<code>Class</code>对象，
+<code>Class</code>对象封装了类在方法区内的数据结构，并且向Java程序员提供了访问方法区内的数据结构的接口。</p>
+<figure>
+<img src="/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702120310.png" alt="微信截图_20230702120310">
+<figcaption aria-hidden="true">微信截图_20230702120310</figcaption>
+</figure>
 <p>类加载器并不需要等到某个类被“首次主动使用”时再加载它，JVM规范允许类加载器在预料某个类将要被使用时就预先加载它，如果在预先加载的过程中遇到了.class文件缺失或存在错误，类加载器必须在程序首次主动使用该类时才报告错误（LinkageError错误）如果这个类一直没有被程序主动使用，那么类加载器就不会报告错误</p>
 <p><strong>加载.class文件的方式</strong></p>
 <ul>
@@ -78,32 +49,43 @@
 <li>从专有数据库中提取.class文件</li>
 <li>将Java源文件动态编译为.class文件</li>
 </ul>
-<h2 id="2、类的生命周期"><a href="#2、类的生命周期" class="headerlink" title="2、类的生命周期"></a>2、类的生命周期</h2><p>其中类加载的过程包括了加载、验证、准备、解析、初始化五个阶段。在这五个阶段中，加载、验证、准备和初始化这四个阶段发生的顺序是确定的，而解析阶段则不一定，它在某些情况下可以在初始化阶段之后开始，这是为了支持Java语言的运行时绑定（也成为动态绑定或晚期绑定）。另外注意这里的几个阶段是按顺序开始，而不是按顺序进行或完成，因为这些阶段通常都是互相交叉地混合进行的，通常在一个阶段执行的过程中调用或激活另一个阶段。</p>
-<h3 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h3><p>查找并加载类的二进制数据加载时类加载过程的第一个阶段，在加载阶段，虚拟机需要完成以下三件事情：</p>
+<h2 id="类的生命周期">2、类的生命周期</h2>
+<p>其中类加载的过程包括了加载、验证、准备、解析、初始化五个阶段。在这五个阶段中，加载、验证、准备和初始化这四个阶段发生的顺序是确定的，而解析阶段则不一定，它在某些情况下可以在初始化阶段之后开始，这是为了支持Java语言的运行时绑定（也成为动态绑定或晚期绑定）。另外注意这里的几个阶段是按顺序开始，而不是按顺序进行或完成，因为这些阶段通常都是互相交叉地混合进行的，通常在一个阶段执行的过程中调用或激活另一个阶段。</p>
+<h3 id="加载">加载</h3>
+<p>查找并加载类的二进制数据加载时类加载过程的第一个阶段，在加载阶段，虚拟机需要完成以下三件事情：</p>
 <ul>
 <li>通过一个类的全限定名来获取其定义的二进制字节流。</li>
 <li>将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。</li>
-<li>在Java堆中生成一个代表这个类的 <code>java.lang.Class</code>对象，作为对方法区中这些数据的访问入口。</li>
+<li>在Java堆中生成一个代表这个类的
+<code>java.lang.Class</code>对象，作为对方法区中这些数据的访问入口。</li>
 </ul>
 <p>相对于类加载的其他阶段而言，加载阶段（准确地说，是加载阶段获取类的二进制字节流的动作）是可控性最强的阶段，因为开发人员既可以使用系统提供的类加载器来完成加载，也可以自定义自己的类加载器来完成加载。</p>
-<p>加载阶段完成后，虚拟机外部的二进制字节流就按照虚拟机所需的格式存储在方法区之中，而且在Java堆中也创建一个 <code>java.lang.Class</code>类的对象，这样便可以通过该对象访问方法区中的这些数据。</p>
-<h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><p><strong>验证：确保被加载的类的正确性</strong></p>
+<p>加载阶段完成后，虚拟机外部的二进制字节流就按照虚拟机所需的格式存储在方法区之中，而且在Java堆中也创建一个
+<code>java.lang.Class</code>类的对象，这样便可以通过该对象访问方法区中的这些数据。</p>
+<h3 id="连接">连接</h3>
+<p><strong>验证：确保被加载的类的正确性</strong></p>
 <p>验证是连接阶段的第一步，这一阶段的目的是为了确保Class文件的字节流中包含的信息符合当前虚拟机的要求，并且不会危害虚拟机自身的安全。验证阶段大致会完成4个阶段的检验动作：</p>
 <ul>
-<li><strong>文件格式验证</strong>：验证字节流是否符合Class文件格式的规范；例如：是否以 <code>0xCAFEBABE</code>开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型。</li>
-<li><strong>元数据验证</strong>：对字节码描述的信息进行语义分析（注意：对比javac编译阶段的语义分析），以保证其描述的信息符合Java语言规范的要求；例如：这个类是否有父类，除了 <code>java.lang.Object</code>之外。</li>
+<li><strong>文件格式验证</strong>：验证字节流是否符合Class文件格式的规范；例如：是否以
+<code>0xCAFEBABE</code>开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型。</li>
+<li><strong>元数据验证</strong>：对字节码描述的信息进行语义分析（注意：对比javac编译阶段的语义分析），以保证其描述的信息符合Java语言规范的要求；例如：这个类是否有父类，除了
+<code>java.lang.Object</code>之外。</li>
 <li><strong>字节码验证</strong>：通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的。</li>
 <li><strong>符号引用验证</strong>：确保解析动作能正确执行。</li>
 </ul>
-<p>验证阶段是非常重要的，但不是必须的，它对程序运行期没有影响，如果所引用的类经过反复验证，那么可以考虑采用 <code>-Xverifynone</code>参数来关闭大部分的类验证措施，以缩短虚拟机类加载的时间。</p>
-<p><strong>准备：为类的 <code>静态变量分</code>配内存，并将其初始化为默认值</strong></p>
+<p>验证阶段是非常重要的，但不是必须的，它对程序运行期没有影响，如果所引用的类经过反复验证，那么可以考虑采用
+<code>-Xverifynone</code>参数来关闭大部分的类验证措施，以缩短虚拟机类加载的时间。</p>
+<p><strong>准备：为类的
+<code>静态变量分</code>配内存，并将其初始化为默认值</strong></p>
 <p>准备阶段是正式为类变量分配内存并设置类变量初始值的阶段，这些内存都将在方法区中分配。对于该阶段有以下几点需要注意：</p>
 <ul>
 <li>1、这时候进行内存分配的仅包括类变量（static），而不包括实例变量，实例变量会在对象实例化时随着对象一块分配在Java堆中。</li>
 <li>2、这里所设置的初始值通常情况下是数据类型默认的零值（如0、0L、null、false等），而不是被在Java代码中被显式地赋予的值。</li>
 </ul>
 <p>假设一个类变量的定义为： <code>publicstaticintvalue=3</code>；</p>
-<p>那么变量value在准备阶段过后的初始值为0，而不是3，因为这时候尚未开始执行任何Java方法，而把value赋值为3的 <code>publicstatic</code>指令是在程序编译后，存放于类构造器 <code>&lt;clinit&gt;（）</code>方法之中的，所以把value赋值为3的动作将在初始化阶段才会执行。</p>
+<p>那么变量value在准备阶段过后的初始值为0，而不是3，因为这时候尚未开始执行任何Java方法，而把value赋值为3的
+<code>publicstatic</code>指令是在程序编译后，存放于类构造器
+<code>&lt;clinit&gt;（）</code>方法之中的，所以把value赋值为3的动作将在初始化阶段才会执行。</p>
 <blockquote>
 <p>这里还需要注意如下几点：</p>
 <ul>
@@ -114,10 +96,14 @@
 </ul>
 </blockquote>
 <ul>
-<li>3、如果类字段的字段属性表中存在 <code>ConstantValue</code>属性，即同时被final和static修饰，那么在准备阶段变量value就会被初始化为ConstValue属性所指定的值。</li>
+<li>3、如果类字段的字段属性表中存在
+<code>ConstantValue</code>属性，即同时被final和static修饰，那么在准备阶段变量value就会被初始化为ConstValue属性所指定的值。</li>
 </ul>
-<p>假设上面的类变量value被定义为： <code>publicstaticfinalintvalue=3</code>；</p>
-<p>编译时Javac将会为value生成ConstantValue属性，在准备阶段虚拟机就会根据 <code>ConstantValue</code>的设置将value赋值为3。我们可以理解为static final常量在编译期就将其结果放入了调用它的类的常量池中</p>
+<p>假设上面的类变量value被定义为：
+<code>publicstaticfinalintvalue=3</code>；</p>
+<p>编译时Javac将会为value生成ConstantValue属性，在准备阶段虚拟机就会根据
+<code>ConstantValue</code>的设置将value赋值为3。我们可以理解为static
+final常量在编译期就将其结果放入了调用它的类的常量池中</p>
 <p><strong>解析：把类中的符号引用转换为直接引用</strong></p>
 <p>解析阶段是虚拟机将常量池内的符号引用替换为直接引用的过程，解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符7类符号引用进行。符号引用就是一组符号来描述目标，可以是任何字面量。</p>
 <p>直接引用就是直接指向目标的指针、相对偏移量或一个间接定位到目标的句柄。</p>
@@ -140,7 +126,9 @@
 <li>调用类的静态方法</li>
 <li>反射（如 <code>Class.forName(“com.shengsiyuan.Test”)</code>）</li>
 <li>初始化某个类的子类，则其父类也会被初始化</li>
-<li>Java虚拟机启动时被标明为启动类的类（ <code>JavaTest</code>），直接使用 <code>java.exe</code>命令来运行某个主类</li>
+<li>Java虚拟机启动时被标明为启动类的类（
+<code>JavaTest</code>），直接使用
+<code>java.exe</code>命令来运行某个主类</li>
 </ul>
 <p><strong>结束生命周期</strong></p>
 <p>在如下几种情况下，Java虚拟机将结束生命周期</p>
@@ -150,22 +138,40 @@
 <li>程序在执行过程中遇到了异常或错误而异常终止</li>
 <li>由于操作系统出现错误而导致Java虚拟机进程终止</li>
 </ul>
-<h2 id="3、类加载器"><a href="#3、类加载器" class="headerlink" title="3、类加载器"></a>3、类加载器</h2><p>寻找类加载器，先来一个小例子</p>
+<h2 id="类加载器">3、类加载器</h2>
+<p>寻找类加载器，先来一个小例子</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">package com.neo.classloader;public class ClassLoaderTest &#123;     public static void main(String[] args) &#123;        ClassLoader loader = Thread.currentThread().getContextClassLoader();        System.out.println(loader);        System.out.println(loader.getParent());        System.out.println(loader.getParent().getParent());    &#125;&#125;</span><br></pre></td></tr></table></figure>
-
 <p>运行后，输出结果：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sun.misc.Launcher$AppClassLoader@64fef26asun.misc.Launcher$ExtClassLoader@1ddd40f3null</span><br></pre></td></tr></table></figure>
-
-<p>从上面的结果可以看出，并没有获取到 <code>ExtClassLoader</code>的父Loader，原因是 <code>BootstrapLoader</code>（引导类加载器）是用C语言实现的，找不到一个确定的返回父Loader的方式，于是就返回null。</p>
+<p>从上面的结果可以看出，并没有获取到
+<code>ExtClassLoader</code>的父Loader，原因是
+<code>BootstrapLoader</code>（引导类加载器）是用C语言实现的，找不到一个确定的返回父Loader的方式，于是就返回null。</p>
 <p>这几种类加载器的层次关系如下图所示：</p>
-<p><img src="/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20230702121042.png" alt="微信截图_20230702121042"></p>
+<figure>
+<img src="/2022/03/10/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E4%B8%80)java%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6//微信截图_20230702121042.png" alt="微信截图_20230702121042">
+<figcaption aria-hidden="true">微信截图_20230702121042</figcaption>
+</figure>
 <blockquote>
 <p>注意：这里父类加载器并不是通过继承关系来实现的，而是采用组合实现的。</p>
 </blockquote>
-<p>站在Java虚拟机的角度来讲，只存在两种不同的类加载器：启动类加载器：它使用C++实现（这里仅限于Hotspot，也就是JDK1.5之后默认的虚拟机，有很多其他的虚拟机是用Java语言实现的），是虚拟机自身的一部分；所有其它的类加载器：这些类加载器都由Java语言实现，独立于虚拟机之外，并且全部继承自抽象类 <code>java.lang.ClassLoader</code>，这些类加载器需要由启动类加载器加载到内存中之后才能去加载其他的类。</p>
+<p>站在Java虚拟机的角度来讲，只存在两种不同的类加载器：启动类加载器：它使用C++实现（这里仅限于Hotspot，也就是JDK1.5之后默认的虚拟机，有很多其他的虚拟机是用Java语言实现的），是虚拟机自身的一部分；所有其它的类加载器：这些类加载器都由Java语言实现，独立于虚拟机之外，并且全部继承自抽象类
+<code>java.lang.ClassLoader</code>，这些类加载器需要由启动类加载器加载到内存中之后才能去加载其他的类。</p>
 <p>站在Java开发人员的角度来看，类加载器可以大致划分为以下三类：</p>
-<p><strong>启动类加载器</strong>： <code>BootstrapClassLoader</code>，负责加载存放在 <code>JDK\jre\lib</code>(JDK代表JDK的安装目录，下同)下，或被 <code>-Xbootclasspath</code>参数指定的路径中的，并且能被虚拟机识别的类库（如rt.jar，所有的java.开头的类均被 <code>BootstrapClassLoader</code>加载）。启动类加载器是无法被Java程序直接引用的。<br><strong>扩展类加载器</strong>： <code>ExtensionClassLoader</code>，该加载器由 <code>sun.misc.Launcher$ExtClassLoader</code>实现，它负责加载 <code>JDK\jre\lib\ext</code>目录中，或者由 <code>java.ext.dirs</code>系统变量指定的路径中的所有类库（如javax.开头的类），开发者可以直接使用扩展类加载器。<br><strong>应用程序类加载器</strong>： <code>ApplicationClassLoader</code>，该类加载器由 <code>sun.misc.Launcher$AppClassLoader</code>来实现，它负责加载用户类路径（ClassPath）所指定的类，开发者可以直接使用该类加载器，如果应用程序中没有自定义过自己的类加载器，一般情况下这个就是程序中默认的类加载器。</p>
-<p>应用程序都是由这三种类加载器互相配合进行加载的，如果有必要，我们还可以加入自定义的类加载器。因为JVM自带的ClassLoader只是懂得从本地文件系统加载标准的java class文件，因此如果编写了自己的ClassLoader，便可以做到如下几点：</p>
+<p><strong>启动类加载器</strong>：
+<code>BootstrapClassLoader</code>，负责加载存放在
+<code>JDK\jre\lib</code>(JDK代表JDK的安装目录，下同)下，或被
+<code>-Xbootclasspath</code>参数指定的路径中的，并且能被虚拟机识别的类库（如rt.jar，所有的java.开头的类均被
+<code>BootstrapClassLoader</code>加载）。启动类加载器是无法被Java程序直接引用的。
+<strong>扩展类加载器</strong>：
+<code>ExtensionClassLoader</code>，该加载器由
+<code>sun.misc.Launcher$ExtClassLoader</code>实现，它负责加载
+<code>JDK\jre\lib\ext</code>目录中，或者由
+<code>java.ext.dirs</code>系统变量指定的路径中的所有类库（如javax.开头的类），开发者可以直接使用扩展类加载器。
+<strong>应用程序类加载器</strong>：
+<code>ApplicationClassLoader</code>，该类加载器由
+<code>sun.misc.Launcher$AppClassLoader</code>来实现，它负责加载用户类路径（ClassPath）所指定的类，开发者可以直接使用该类加载器，如果应用程序中没有自定义过自己的类加载器，一般情况下这个就是程序中默认的类加载器。</p>
+<p>应用程序都是由这三种类加载器互相配合进行加载的，如果有必要，我们还可以加入自定义的类加载器。因为JVM自带的ClassLoader只是懂得从本地文件系统加载标准的java
+class文件，因此如果编写了自己的ClassLoader，便可以做到如下几点：</p>
 <ul>
 <li>1、在执行非置信代码之前，自动验证数字签名。</li>
 <li>2、动态地创建符合用户特定需要的定制化构建类。</li>
@@ -177,7 +183,8 @@
 <li><strong>父类委托</strong>，先让父类加载器试图加载该类，只有在父类加载器无法加载该类时才尝试从自己的类路径中加载该类</li>
 <li><strong>缓存机制</strong>，缓存机制将会保证所有加载过的Class都会被缓存，当程序中需要使用某个Class时，类加载器先从缓存区寻找该Class，只有缓存区不存在，系统才会读取该类对应的二进制数据，并将其转换成Class对象，存入缓存区。这就是为什么修改了Class后，必须重启JVM，程序的修改才会生效</li>
 </ul>
-<h2 id="4、类的加载"><a href="#4、类的加载" class="headerlink" title="4、类的加载"></a>4、类的加载</h2><p>类加载有三种方式：</p>
+<h2 id="类的加载">4、类的加载</h2>
+<p>类加载有三种方式：</p>
 <ul>
 <li>1、命令行启动应用时候由JVM初始化加载</li>
 <li>2、通过Class.forName()方法动态加载</li>
@@ -185,148 +192,115 @@
 </ul>
 <p>例子：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">package com.neo.classloader;public class loaderTest &#123;         public static void main(String[] args) throws ClassNotFoundException &#123;                 ClassLoader loader = HelloWorld.class.getClassLoader();                 System.out.println(loader);                 //使用ClassLoader.loadClass()来加载类，不会执行初始化块                 loader.loadClass(&quot;Test2&quot;);                 //使用Class.forName()来加载类，默认会执行初始化块                 //Class.forName(&quot;Test2&quot;);                 //使用Class.forName()来加载类，并指定ClassLoader，初始化时不执行静态块                 //Class.forName(&quot;Test2&quot;, false, loader);         &#125; &#125;</span><br></pre></td></tr></table></figure>
-
 <p>demo类</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public class Test2 &#123;         static &#123;                 System.out.println(&quot;静态初始化块执行了！&quot;);         &#125; &#125;</span><br></pre></td></tr></table></figure>
-
 <p>分别切换加载方式，会有不同的输出结果。</p>
 <p><strong>Class.forName()和ClassLoader.loadClass()区别</strong></p>
 <ul>
 <li><code>Class.forName()</code>：将类的.class文件加载到jvm中之外，还会对类进行解释，执行类中的static块；</li>
 <li><code>ClassLoader.loadClass()</code>：只干一件事情，就是将.class文件加载到jvm中，不会执行static中的内容,只有在newInstance才会去执行static块。</li>
-<li><code>Class.forName(name,initialize,loader)</code>带参函数也可控制是否加载static块。并且只有调用了newInstance()方法采用调用构造函数，创建类的对象 。</li>
+<li><code>Class.forName(name,initialize,loader)</code>带参函数也可控制是否加载static块。并且只有调用了newInstance()方法采用调用构造函数，创建类的对象
+。</li>
 </ul>
-<h2 id="5、双亲委派模型"><a href="#5、双亲委派模型" class="headerlink" title="5、双亲委派模型"></a>5、双亲委派模型</h2><p>双亲委派模型的工作流程是：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。</p>
+<h2 id="双亲委派模型">5、双亲委派模型</h2>
+<p>双亲委派模型的工作流程是：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上，因此，所有的类加载请求最终都应该被传递到顶层的启动类加载器中，只有当父加载器在它的搜索范围中没有找到所需的类时，即无法完成该加载，子加载器才会尝试自己去加载该类。</p>
 <p>双亲委派机制:</p>
 <ul>
-<li>1、当 <code>AppClassLoader</code>加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器<code>ExtClassLoader</code>去完成。</li>
-<li>2、当 <code>ExtClassLoader</code>加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给BootStrapClassLoader&#96;&#96;&#96;去完成。</li>
-<li>3、如果 <code>BootStrapClassLoader</code>加载失败（例如在 <code>$JAVA_HOME/jre/lib</code>里未查找到该class），会使用 <code>ExtClassLoader</code>来尝试加载；</li>
-<li>4、若ExtClassLoader也加载失败，则会使用 <code>AppClassLoader</code>来加载，如果 <code>AppClassLoader</code>也加载失败，则会报出异常 <code>ClassNotFoundException</code>。</li>
+<li>1、当
+<code>AppClassLoader</code>加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器<code>ExtClassLoader</code>去完成。</li>
+<li>2、当
+<code>ExtClassLoader</code>加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给BootStrapClassLoader```去完成。</li>
+<li>3、如果 <code>BootStrapClassLoader</code>加载失败（例如在
+<code>$JAVA_HOME/jre/lib</code>里未查找到该class），会使用
+<code>ExtClassLoader</code>来尝试加载；</li>
+<li>4、若ExtClassLoader也加载失败，则会使用
+<code>AppClassLoader</code>来加载，如果
+<code>AppClassLoader</code>也加载失败，则会报出异常
+<code>ClassNotFoundException</code>。</li>
 </ul>
 <p>ClassLoader源码分析：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public Class&lt;?&gt; loadClass(String name)throws ClassNotFoundException &#123;        return loadClass(name, false);&#125;protected synchronized Class&lt;?&gt; loadClass(String name, boolean resolve)throws ClassNotFoundException &#123;        // 首先判断该类型是否已经被加载        Class c = findLoadedClass(name);        if (c == null) &#123;            //如果没有被加载，就委托给父类加载或者委派给启动类加载器加载            try &#123;                if (parent != null) &#123;                     //如果存在父类加载器，就委派给父类加载器加载                    c = parent.loadClass(name, false);                &#125; else &#123;                //如果不存在父类加载器，就检查是否是由启动类加载器加载的类，通过调用本地方法native Class findBootstrapClass(String name)                    c = findBootstrapClass0(name);                &#125;            &#125; catch (ClassNotFoundException e) &#123;             // 如果父类加载器和启动类加载器都不能完成加载任务，才调用自身的加载功能                c = findClass(name);            &#125;        &#125;        if (resolve) &#123;            resolveClass(c);        &#125;        return c;    &#125;</span><br></pre></td></tr></table></figure>
-
 <p>双亲委派模型意义：</p>
 <ul>
 <li>系统类防止内存中出现多份同样的字节码</li>
 <li>保证Java程序安全稳定运行</li>
 </ul>
-<h2 id="6、自定义类加载器"><a href="#6、自定义类加载器" class="headerlink" title="6、自定义类加载器"></a>6、自定义类加载器</h2><p>通常情况下，我们都是直接使用系统类加载器。但是，有的时候，我们也需要自定义类加载器。比如应用是通过网络来传输 Java类的字节码，为保证安全性，这些字节码经过了加密处理，这时系统类加载器就无法对其进行加载，这样则需要自定义类加载器来实现。自定义类加载器一般都是继承自 <code>ClassLoader</code>类，从上面对 <code>loadClass</code>方法来分析来看，我们只需要重写 findClass 方法即可。下面我们通过一个示例来演示自定义类加载器的流程：</p>
+<h2 id="自定义类加载器">6、自定义类加载器</h2>
+<p>通常情况下，我们都是直接使用系统类加载器。但是，有的时候，我们也需要自定义类加载器。比如应用是通过网络来传输
+Java类的字节码，为保证安全性，这些字节码经过了加密处理，这时系统类加载器就无法对其进行加载，这样则需要自定义类加载器来实现。自定义类加载器一般都是继承自
+<code>ClassLoader</code>类，从上面对
+<code>loadClass</code>方法来分析来看，我们只需要重写 findClass
+方法即可。下面我们通过一个示例来演示自定义类加载器的流程：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">package com.neo.classloader;import java.io.*;public class MyClassLoader extends ClassLoader &#123;    private String root;    protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;        byte[] classData = loadClassData(name);        if (classData == null) &#123;            throw new ClassNotFoundException();        &#125; else &#123;            return defineClass(name, classData, 0, classData.length);        &#125;    &#125;    private byte[] loadClassData(String className) &#123;        String fileName = root + File.separatorChar                + className.replace(&#x27;.&#x27;, File.separatorChar) + &quot;.class&quot;;        try &#123;            InputStream ins = new FileInputStream(fileName);            ByteArrayOutputStream baos = new ByteArrayOutputStream();            int bufferSize = 1024;            byte[] buffer = new byte[bufferSize];            int length = 0;            while ((length = ins.read(buffer)) != -1) &#123;                baos.write(buffer, 0, length);            &#125;            return baos.toByteArray();        &#125; catch (IOException e) &#123;            e.printStackTrace();        &#125;        return null;    &#125;    public String getRoot() &#123;        return root;    &#125;    public void setRoot(String root) &#123;        this.root = root;    &#125;    public static void main(String[] args)  &#123;        MyClassLoader classLoader = new MyClassLoader();        classLoader.setRoot(&quot;E:\\temp&quot;);        Class&lt;?&gt; testClass = null;        try &#123;            testClass = classLoader.loadClass(&quot;com.neo.classloader.Test2&quot;);            Object object = testClass.newInstance();            System.out.println(object.getClass().getClassLoader());        &#125; catch (ClassNotFoundException e) &#123;            e.printStackTrace();        &#125; catch (InstantiationException e) &#123;            e.printStackTrace();        &#125; catch (IllegalAccessException e) &#123;            e.printStackTrace();        &#125;    &#125;&#125;</span><br></pre></td></tr></table></figure>
-
 <p>自定义类加载器的核心在于对字节码文件的获取，如果是加密的字节码则需要在该类中对文件进行解密。由于这里只是演示，我并未对class文件进行加密，因此没有解密的过程。这里有几点需要注意：</p>
 <ul>
-<li>1、这里传递的文件名需要是类的全限定性名称，即 <code>com.paddx.test.classloading.Test</code>格式的，因为 defineClass 方法是按这种格式进行处理的。</li>
+<li>1、这里传递的文件名需要是类的全限定性名称，即
+<code>com.paddx.test.classloading.Test</code>格式的，因为 defineClass
+方法是按这种格式进行处理的。</li>
 <li>2、最好不要重写loadClass方法，因为这样容易破坏双亲委托模式。</li>
-<li>3、这类Test 类本身可以被 <code>AppClassLoader</code>类加载，因此我们不能把 <code>com/paddx/test/classloading/Test.class</code>放在类路径下。否则，由于双亲委托机制的存在，会直接导致该类由 <code>AppClassLoader</code>加载，而不会通过我们自定义类加载器来加载。</li>
+<li>3、这类Test 类本身可以被
+<code>AppClassLoader</code>类加载，因此我们不能把
+<code>com/paddx/test/classloading/Test.class</code>放在类路径下。否则，由于双亲委托机制的存在，会直接导致该类由
+<code>AppClassLoader</code>加载，而不会通过我们自定义类加载器来加载。</li>
 </ul>
-	  
-
-	  <div>
-  		<center>
-		  <div class="pagination">
-<ul class="pagination">
-	
-	
-	
-	
-	
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-		
-	
-		
-			
-			
-		
-	
-	
-	
-		<li class="prev"><a href="../../../../11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%9B%9B)jvm%E8%B0%83%E4%BC%98-%E5%91%BD%E4%BB%A4%E7%AF%87/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
-	
-	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
-	
-		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
-	
-</ul>
-</div>
-
-		</center>
-	  </div>
-	  
-	</div> <!-- col-md-9/col-md-12 -->
-	
-  </div><!-- row -->
-
-	</div>
-  </div>
-  <div class="container-narrow">
-	<footer> <p>
-  &copy; 2023 albert dong
-  
-      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Please inform us of any infringement by 517916466@qq.com
-</p> </footer>
-  </div> <!-- container-narrow -->
-  
-<a id="gotop" href="#">   
-  <span>▲</span> 
-</a>
-
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/jquery.tableofcontents.min.js"></script>
-<script src="/js/tocgenerator.min.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/search.js"></script> 
-
-
-
-
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-(function($){
-  $('.fancybox').fancybox();
-})(jQuery);
-</script>
-
-
-
-
-</body>
-</html>
+</div><div class="article-licensing box"><div class="licensing-title"><p>jvm系列(一):java类的加载机制</p><p><a href="https://0914ds.github.io/2022/03/10/JVM/JVM调优合集/jvm系列(一)java类的加载机制/">https://0914ds.github.io/2022/03/10/JVM/JVM调优合集/jvm系列(一)java类的加载机制/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2022-03-10</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-07-02</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="../../../../11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%9B%9B)jvm%E8%B0%83%E4%BC%98-%E5%91%BD%E4%BB%A4%E7%AF%87/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">jvm系列(四):jvm调优-命令篇</span></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#一jvm系列一java类的加载机制"><span class="level-left"><span class="level-item">1</span><span class="level-item">一，jvm系列(一):java类的加载机制</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#什么是类的加载"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">1、什么是类的加载</span></span></a></li><li><a class="level is-mobile" href="#类的生命周期"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">2、类的生命周期</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#加载"><span class="level-left"><span class="level-item">1.2.1</span><span class="level-item">加载</span></span></a></li><li><a class="level is-mobile" href="#连接"><span class="level-left"><span class="level-item">1.2.2</span><span class="level-item">连接</span></span></a></li></ul></li><li><a class="level is-mobile" href="#类加载器"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">3、类加载器</span></span></a></li><li><a class="level is-mobile" href="#类的加载"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">4、类的加载</span></span></a></li><li><a class="level is-mobile" href="#双亲委派模型"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">5、双亲委派模型</span></span></a></li><li><a class="level is-mobile" href="#自定义类加载器"><span class="level-left"><span class="level-item">1.6</span><span class="level-item">6、自定义类加载器</span></span></a></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="../../../../../../2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="../../../../../../2023/06/17/%E6%B6%88%E6%81%AF/kafka/">kafka</a></p><p class="categories"><a href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../../../../2023/06/05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="../../../../../../js/column.js"></script><script src="../../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
+            'HTML-CSS': {
+                matchFontHeight: false
+            },
+            SVG: {
+                matchFontHeight: false
+            },
+            CommonHTML: {
+                matchFontHeight: false
+            },
+            tex2jax: {
+                inlineMath: [
+                    ['$','$'],
+                    ['\\(','\\)']
+                ]
+            }
+        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"../../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
+        });</script></body></html>
