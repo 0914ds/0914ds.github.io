@@ -1,36 +1,237 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>多元线性回归 - blog</title><link rel="manifest" href="../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="梯度下降 线性回归预测房价  数据加载 数据介绍 数据拆分 数据建模 数据预测 数据评估  1、无约束最优化问题 1.1、无约束最优化    无约束最优化问题（unconstrained optimization problem）指的是从一个问题的所有可能的备选方案中，选择出依某种指标来说是最优的解决方案。从数学上说，最优化是研究在一个给定的集合S上泛函\(J(\th"><meta property="og:type" content="blog"><meta property="og:title" content="多元线性回归"><meta property="og:url" content="https://0914ds.github.io/2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/"><meta property="og:site_name" content="blog"><meta property="og:description" content="梯度下降 线性回归预测房价  数据加载 数据介绍 数据拆分 数据建模 数据预测 数据评估  1、无约束最优化问题 1.1、无约束最优化    无约束最优化问题（unconstrained optimization problem）指的是从一个问题的所有可能的备选方案中，选择出依某种指标来说是最优的解决方案。从数学上说，最优化是研究在一个给定的集合S上泛函\(J(\th"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/ac185dc9b60d4411b6d0c9ae9dc15543.jpg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/6e97ba09e2694bf69d2919cd159a6a59.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/680d3e456f084caa87d35c55ece68b98.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/22d31ba2d7c348bca74593141837f569.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/66ce3adba54149a382512476bf1da237.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/9f2ec32dd16d40ceb75d032cbe6d3ea9.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/83476c288f4d4e84951997fc776a8fa1.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/c782a1c81fb240c89ef39bf55d74d3e1.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/7d59daf9da474ef9b1716191f47064c8.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/51536cae3e524a419ab6feff64e5df31.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/9d04508431a94e4f9a54bed4c6e01dc8.jpg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/c3a7bf82304d4cd990306bccc9e33e98.jpg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/29a4d4047fa24ea495f55630a6c6d174.jpg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/83b78948c0074a17b4334e1ca691b8fc.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/49c3dfaf8c4b4a54ab80a7e51f90cfa6.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/670e2e063398461e9143ae13b7c4709a.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/038487f53e8f4c47af75de156a2e98c4.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/1e745bd465d542cc8593e12977a6cb26.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/bd716fec62c2485e831263b5d84f8197.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/52e7aec970ae4be887f2b6eb059e5a54.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/f983d092c8914a60876c80853bd08b43.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/b23d78b73e8c4a88813c02917ff33853.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/4e0a2d7309a2482882c7c641014a98af.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/25e11b29bcdc48df880924c7e75c1b16.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/608f1025518842188c8c47350e5e8ce8.png"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/fa690fe760284383b198810802e82995.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/0bbe5b04ddf24a78a71c4700cbde90a5.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/da9eec25972249f1a587a10d5723320f.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/def103855dc34212bd5cfda1686a73bb.jpeg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/f95707a6d51948c3a6aa7fcb61b5c055.jpg"><meta property="og:image" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/ab1758d6f7504c128eee9bdb71045e4d.png"><meta property="article:published_time" content="2023-08-17T17:13:16.000Z"><meta property="article:modified_time" content="2023-08-17T17:30:11.349Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/ac185dc9b60d4411b6d0c9ae9dc15543.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/"},"headline":"多元线性回归","image":["https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/ac185dc9b60d4411b6d0c9ae9dc15543.jpg","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/680d3e456f084caa87d35c55ece68b98.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/66ce3adba54149a382512476bf1da237.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/7d59daf9da474ef9b1716191f47064c8.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/9d04508431a94e4f9a54bed4c6e01dc8.jpg","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/c3a7bf82304d4cd990306bccc9e33e98.jpg","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/29a4d4047fa24ea495f55630a6c6d174.jpg","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/49c3dfaf8c4b4a54ab80a7e51f90cfa6.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/670e2e063398461e9143ae13b7c4709a.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/038487f53e8f4c47af75de156a2e98c4.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/1e745bd465d542cc8593e12977a6cb26.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/bd716fec62c2485e831263b5d84f8197.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/52e7aec970ae4be887f2b6eb059e5a54.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/f983d092c8914a60876c80853bd08b43.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/4e0a2d7309a2482882c7c641014a98af.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/608f1025518842188c8c47350e5e8ce8.png","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/f95707a6d51948c3a6aa7fcb61b5c055.jpg","https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1652339399091/ab1758d6f7504c128eee9bdb71045e4d.png"],"datePublished":"2023-08-17T17:13:16.000Z","dateModified":"2023-08-17T17:30:11.349Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"梯度下降\r 线性回归预测房价\r \r 数据加载\r 数据介绍\r 数据拆分\r 数据建模\r 数据预测\r 数据评估\r \r 1、无约束最优化问题\r 1.1、无约束最优化\r    无约束最优化问题（unconstrained optimization\r problem）指的是从一个问题的所有可能的备选方案中，选择出依某种指标来说是最优的解决方案。从数学上说，最优化是研究在一个给定的集合S上泛函\\(J(\\th"}</script><link rel="canonical" href="https://0914ds.github.io/2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/"><link rel="icon" href="../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
-  (function () {
-      function switchTab() {
-          if (!location.hash) {
-            return;
-          }
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="梯度下降" />
+    <meta name="hexo-theme-A4" content="v1.9.7" />
+    <link rel="alternate icon" type="image/webp" href="../../../../../img/favicon.webp">
+    <title>blog</title>
 
-          const id = '#' + CSS.escape(location.hash.substring(1));
-          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
-          if (!$tabMenu) {
-            return;
-          }
+    
+        
+<link rel="stylesheet" href="../../../../../css/highlight/style1.css">
 
-          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
-          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
-          Array.from($tabMenuContainer.querySelectorAll('a'))
-              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
-              .forEach($content => $content.classList.add('is-hidden'));
+        
+<link rel="stylesheet" href="../../../../../css/reset.css">
 
-          if ($tabMenu) {
-              $tabMenu.parentElement.classList.add('is-active');
-          }
-          const $activeTab = document.querySelector(id);
-          if ($activeTab) {
-              $activeTab.classList.remove('is-hidden');
-          }
-      }
-      switchTab();
-      window.addEventListener('hashchange', switchTab, false);
-  })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
-</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../index.html"><img src="../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2023-08-17T17:13:16.000Z" title="2023/8/18 01:13:16">2023-08-18</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-08-17T17:30:11.349Z" title="2023/8/18 01:30:11">2023-08-18</time></span><span class="level-item"><a class="link-muted" href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span><span class="level-item">an hour read (About 7909 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">多元线性回归</h1><div class="content"><meta name="referrer" content="no-referrer">
+        
+<link rel="stylesheet" href="../../../../../css/markdown.css">
+
+        
+<link rel="stylesheet" href="../../../../../css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+        
+        
+<link rel="stylesheet" href="../../../../../css/ui.css">
+ 
+        
+<link rel="stylesheet" href="../../../../../css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="../../../../../css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="../../../../../css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="../../../../../css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="../../../../../css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="../../../../../css/lightgallery-bundle.min.css">
+
+
+   
+        
+<link rel="stylesheet" href="../../../../../css/custom.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head>
+    
+    
+        <style>
+            .index-main{
+                max-width:  880px;
+            }
+        </style>
+
+    
+    
+
+
+
+    
+
+    
+    
+
+
+
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 0; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="../../../../../img/favicon.webp" 
+        />
+        <div class="header-content">
+            <a class="logo" href="../../../../../index.html">blog</a> 
+            <span class="description"></span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="../../../../../index.html">首页</a></li>
+            
+        
+            
+                <li><a href="../../../../../list/">文章</a></li>
+            
+        
+            
+                <li><a href="../../../../../about/">关于</a></li>
+            
+        
+            
+                <li><a href="../../../../../tags/">标签</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    梯度下降
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2023-08-18</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：6.9k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：26分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="post-toc-text">梯度下降</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E9%A2%84%E6%B5%8B%E6%88%BF%E4%BB%B7"><span class="post-toc-text">线性回归预测房价</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%97%A0%E7%BA%A6%E6%9D%9F%E6%9C%80%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="post-toc-text">1、无约束最优化问题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%97%A0%E7%BA%A6%E6%9D%9F%E6%9C%80%E4%BC%98%E5%8C%96"><span class="post-toc-text">1.1、无约束最优化</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D-1"><span class="post-toc-text">1.2、梯度下降</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E5%85%AC%E5%BC%8F"><span class="post-toc-text">1.3、梯度下降公式</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%AD%A6%E4%B9%A0%E7%8E%87"><span class="post-toc-text">1.4、学习率</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%85%A8%E5%B1%80%E6%9C%80%E4%BC%98%E5%8C%96"><span class="post-toc-text">1.5、全局最优化</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%AD%A5%E9%AA%A4"><span class="post-toc-text">1.6、梯度下降步骤</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E4%BB%A3%E7%A0%81%E6%A8%A1%E6%8B%9F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="post-toc-text">1.7、代码模拟梯度下降</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%96%B9%E6%B3%95"><span class="post-toc-text">2、梯度下降方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E4%B8%89%E7%A7%8D%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%B8%8D%E5%90%8C"><span class="post-toc-text">2.1、三种梯度下降不同</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E6%A2%AF%E5%BA%A6%E6%9B%B4%E6%96%B0%E5%85%AC%E5%BC%8F"><span class="post-toc-text">2.2、线性回归梯度更新公式</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%89%B9%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dbgd"><span class="post-toc-text">2.3、批量梯度下降BGD</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dsgd"><span class="post-toc-text">2.4、随机梯度下降SGD</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%B0%8F%E6%89%B9%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dmbgd"><span class="post-toc-text">2.5、小批量梯度下降MBGD</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96"><span class="post-toc-text">2.6、梯度下降优化</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E6%88%98%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="post-toc-text">3、代码实战梯度下降</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%89%B9%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dbgd-1"><span class="post-toc-text">3.1、批量梯度下降BGD</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dsgd-1"><span class="post-toc-text">3.2、随机梯度下降SGD</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%B0%8F%E6%89%B9%E9%87%8F%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dmbgd-1"><span class="post-toc-text">3.3、小批量梯度下降MBGD</span></a></li></ol></li></ol></li></ol>
+            
+        
+        <div class=".article-gallery"><meta name="referrer" content="no-referrer">
 <h2 id="梯度下降">梯度下降</h2>
 <h3 id="线性回归预测房价">线性回归预测房价</h3>
 <ul>
@@ -396,64 +597,187 @@ Decay）</strong>的方式来实现。假设初始化学习率为 <span class="m
 <p><strong>这里我们使用了偏置项，即解决<span class="math inline">\(x_0^{(i)} =
 1\)</span></strong>。多元一次线性回归问题。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># 1、创建数据集X，y</span></span><br><span class="line">X = np.random.rand(<span class="number">100</span>, <span class="number">3</span>)</span><br><span class="line">w = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = (<span class="number">3</span>,<span class="number">1</span>))</span><br><span class="line">b = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = <span class="number">1</span>)</span><br><span class="line">y = X.dot(w) + b + np.random.randn(<span class="number">100</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2、使用偏置项 X_0 = 1，更新X</span></span><br><span class="line">X = np.c_[X, np.ones((<span class="number">100</span>, <span class="number">1</span>))]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3、定义一个函数来调整学习率</span></span><br><span class="line">t0, t1 = <span class="number">5</span>, <span class="number">500</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">learning_rate_schedule</span>(<span class="params">t</span>):</span><br><span class="line">    <span class="keyword">return</span> t0/(t+t1)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4、创建超参数轮次、样本数量、小批量数量</span></span><br><span class="line">epochs = <span class="number">10000</span></span><br><span class="line">n = <span class="number">100</span></span><br><span class="line">batch_size = <span class="number">16</span></span><br><span class="line">num_batches = <span class="built_in">int</span>(n / batch_size)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 5、初始化 W0...Wn，标准正太分布创建W</span></span><br><span class="line">θ = np.random.randn(<span class="number">4</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 6、多次for循环实现梯度下降，最终结果收敛</span></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="comment"># 在双层for循环之间，每个轮次开始分批次迭代之前打乱数据索引顺序</span></span><br><span class="line">    index = np.arange(n)</span><br><span class="line">    np.random.shuffle(index)</span><br><span class="line">    X = X[index]</span><br><span class="line">    y = y[index]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_batches):</span><br><span class="line">        <span class="comment"># 一次取一批数据16个样本</span></span><br><span class="line">        X_batch = X[i * batch_size : (i + <span class="number">1</span>)*batch_size]</span><br><span class="line">        y_batch = y[i * batch_size : (i + <span class="number">1</span>)*batch_size]</span><br><span class="line">        g = X_batch.T.dot(X_batch.dot(θ)-y_batch)</span><br><span class="line">        learning_rate = learning_rate_schedule(epoch * n + i)</span><br><span class="line">        θ = θ - learning_rate * g</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;真实斜率和截距是：&#x27;</span>,w,b)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;梯度下降计算斜率和截距是：&#x27;</span>,θ)</span><br></pre></td></tr></table></figure>
-</div><div class="article-licensing box"><div class="licensing-title"><p>多元线性回归</p><p><a href="https://0914ds.github.io/2023/08/18/机器学习/梯度下降/">https://0914ds.github.io/2023/08/18/机器学习/梯度下降/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2023-08-18</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-08-18</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="../../../17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/"><span class="level-item">多元线性回归</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#梯度下降"><span class="level-left"><span class="level-item">1</span><span class="level-item">梯度下降</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#线性回归预测房价"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">线性回归预测房价</span></span></a></li><li><a class="level is-mobile" href="#无约束最优化问题"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">1、无约束最优化问题</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#无约束最优化"><span class="level-left"><span class="level-item">1.2.1</span><span class="level-item">1.1、无约束最优化</span></span></a></li><li><a class="level is-mobile" href="#梯度下降-1"><span class="level-left"><span class="level-item">1.2.2</span><span class="level-item">1.2、梯度下降</span></span></a></li><li><a class="level is-mobile" href="#梯度下降公式"><span class="level-left"><span class="level-item">1.2.3</span><span class="level-item">1.3、梯度下降公式</span></span></a></li><li><a class="level is-mobile" href="#学习率"><span class="level-left"><span class="level-item">1.2.4</span><span class="level-item">1.4、学习率</span></span></a></li><li><a class="level is-mobile" href="#全局最优化"><span class="level-left"><span class="level-item">1.2.5</span><span class="level-item">1.5、全局最优化</span></span></a></li><li><a class="level is-mobile" href="#梯度下降步骤"><span class="level-left"><span class="level-item">1.2.6</span><span class="level-item">1.6、梯度下降步骤</span></span></a></li><li><a class="level is-mobile" href="#代码模拟梯度下降"><span class="level-left"><span class="level-item">1.2.7</span><span class="level-item">1.7、代码模拟梯度下降</span></span></a></li></ul></li><li><a class="level is-mobile" href="#梯度下降方法"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">2、梯度下降方法</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#三种梯度下降不同"><span class="level-left"><span class="level-item">1.3.1</span><span class="level-item">2.1、三种梯度下降不同</span></span></a></li><li><a class="level is-mobile" href="#线性回归梯度更新公式"><span class="level-left"><span class="level-item">1.3.2</span><span class="level-item">2.2、线性回归梯度更新公式</span></span></a></li><li><a class="level is-mobile" href="#批量梯度下降bgd"><span class="level-left"><span class="level-item">1.3.3</span><span class="level-item">2.3、批量梯度下降BGD</span></span></a></li><li><a class="level is-mobile" href="#随机梯度下降sgd"><span class="level-left"><span class="level-item">1.3.4</span><span class="level-item">2.4、随机梯度下降SGD</span></span></a></li><li><a class="level is-mobile" href="#小批量梯度下降mbgd"><span class="level-left"><span class="level-item">1.3.5</span><span class="level-item">2.5、小批量梯度下降MBGD</span></span></a></li><li><a class="level is-mobile" href="#梯度下降优化"><span class="level-left"><span class="level-item">1.3.6</span><span class="level-item">2.6、梯度下降优化</span></span></a></li></ul></li><li><a class="level is-mobile" href="#代码实战梯度下降"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">3、代码实战梯度下降</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#批量梯度下降bgd-1"><span class="level-left"><span class="level-item">1.4.1</span><span class="level-item">3.1、批量梯度下降BGD</span></span></a></li><li><a class="level is-mobile" href="#随机梯度下降sgd-1"><span class="level-left"><span class="level-item">1.4.2</span><span class="level-item">3.2、随机梯度下降SGD</span></span></a></li><li><a class="level is-mobile" href="#小批量梯度下降mbgd-1"><span class="level-left"><span class="level-item">1.4.3</span><span class="level-item">3.3、小批量梯度下降MBGD</span></span></a></li></ul></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="">多元线性回归</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="../../../../06/17/%E6%B6%88%E6%81%AF/kafka/">kafka</a></p><p class="categories"><a href="../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../../06/05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../index.html"><img src="../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
-            article: {
-                highlight: {
-                    clipboard: true,
-                    fold: 'unfolded'
-                }
-            }
-        };</script><script src="../../../../../js/column.js"></script><script src="../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
-      window.cookieconsent.initialise({
-        type: "info",
-        theme: "edgeless",
-        static: false,
-        position: "bottom-left",
-        content: {
-          message: "This website uses cookies to improve your experience.",
-          dismiss: "Got it!",
-          allow: "Allow cookies",
-          deny: "Decline",
-          link: "Learn more",
-          policy: "Cookie Policy",
-          href: "https://www.cookiesandyou.com/",
-        },
-        palette: {
-          popup: {
-            background: "#edeff5",
-            text: "#838391"
-          },
-          button: {
-            background: "#4b81e8"
-          },
-        },
-      });
-    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
-            if (typeof $.fn.lightGallery === 'function') {
-                $('.article').lightGallery({ selector: '.gallery-item' });
-            }
-            if (typeof $.fn.justifiedGallery === 'function') {
-                if ($('.justified-gallery > p > .gallery-item').length) {
-                    $('.justified-gallery > p > .gallery-item').unwrap();
-                }
-                $('.justified-gallery').justifiedGallery();
-            }
-        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
-            'HTML-CSS': {
-                matchFontHeight: false
-            },
-            SVG: {
-                matchFontHeight: false
-            },
-            CommonHTML: {
-                matchFontHeight: false
-            },
-            tex2jax: {
-                inlineMath: [
-                    ['$','$'],
-                    ['\\(','\\)']
-                ]
-            }
-        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
-            loadInsight({"contentUrl":"../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
-        });</script></body></html>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2023-08-18</span>
+            
+                <span>该篇文章被 albert dong</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/'>
+                            机器学习
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+                    <span>上一篇：<a href='../../../../../2024/02/24/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E4%BC%98%E5%8C%96/'>mysql执行计划</a></span>
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="../../../17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 1949-2024 China 
+
+            
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊看过大海的人不会忘记海的广阔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="../../../../../js/toc.js"></script>
+
+    
+
+    
+<script src="../../../../../js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="../../../../../js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="../../../../../js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="../../../../../js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="../../../../../js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>

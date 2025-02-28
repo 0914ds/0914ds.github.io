@@ -1,36 +1,237 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>jvm系列(六):jvm调优-工具篇 - blog</title><link rel="manifest" href="../../../../../../manifest.json"><meta name="application-name" content="blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="jvm系列(六):jvm调优-工具篇 16年的时候花了一些时间整理了一些关于jvm的介绍文章,到现在回顾起来还是一些还没有补充全面，其中就包括如何利用工具来监控调优前后的性能变化。工具做为图形化界面来展示更能直观的发现问题，另一方面一些耗费性能的分析（dump文件分析）一般也不会在生产直接分析，往往dump下来的文件达1G左右，人工分析效率较低，因此利用工具来分析jvm相关问题，长长可以到达事半"><meta property="og:type" content="blog"><meta property="og:title" content="jvm系列(六):jvm调优-工具篇"><meta property="og:url" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87/"><meta property="og:site_name" content="blog"><meta property="og:description" content="jvm系列(六):jvm调优-工具篇 16年的时候花了一些时间整理了一些关于jvm的介绍文章,到现在回顾起来还是一些还没有补充全面，其中就包括如何利用工具来监控调优前后的性能变化。工具做为图形化界面来展示更能直观的发现问题，另一方面一些耗费性能的分析（dump文件分析）一般也不会在生产直接分析，往往dump下来的文件达1G左右，人工分析效率较低，因此利用工具来分析jvm相关问题，长长可以到达事半"><meta property="og:locale" content="en_US"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131022.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131109.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131138.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131215.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131301.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131341.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131410.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131445.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131520.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131559.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131630.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131714.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131742.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131822.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131852.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131931.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131959.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132030.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132056.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132132.png"><meta property="og:image" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132155.png"><meta property="article:published_time" content="2022-03-10T18:45:12.000Z"><meta property="article:modified_time" content="2023-07-02T05:38:42.932Z"><meta property="article:author" content="albert dong"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131022.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87/"},"headline":"jvm系列(六):jvm调优-工具篇","image":["https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131022.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131109.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131138.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131215.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131301.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131341.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131410.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131445.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131520.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131559.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131630.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131714.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131742.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131822.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131852.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131931.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131959.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132030.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132056.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132132.png","https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132155.png"],"datePublished":"2022-03-10T18:45:12.000Z","dateModified":"2023-07-02T05:38:42.932Z","author":{"@type":"Person","name":"albert dong"},"publisher":{"@type":"Organization","name":"blog","logo":{"@type":"ImageObject","url":"https://0914ds.github.io/img/logo.svg"}},"description":"jvm系列(六):jvm调优-工具篇\r 16年的时候花了一些时间整理了一些关于jvm的介绍文章,到现在回顾起来还是一些还没有补充全面，其中就包括如何利用工具来监控调优前后的性能变化。工具做为图形化界面来展示更能直观的发现问题，另一方面一些耗费性能的分析（dump文件分析）一般也不会在生产直接分析，往往dump下来的文件达1G左右，人工分析效率较低，因此利用工具来分析jvm相关问题，长长可以到达事半"}</script><link rel="canonical" href="https://0914ds.github.io/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87/"><link rel="icon" href="../../../../../../img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="../../../../../../css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
-  (function () {
-      function switchTab() {
-          if (!location.hash) {
-            return;
-          }
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+    <meta name="description" content="jvm系列(六):jvm调优-工具篇" />
+    <meta name="hexo-theme-A4" content="v1.9.7" />
+    <link rel="alternate icon" type="image/webp" href="../../../../../../img/favicon.webp">
+    <title>blog</title>
 
-          const id = '#' + CSS.escape(location.hash.substring(1));
-          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
-          if (!$tabMenu) {
-            return;
-          }
+    
+        
+<link rel="stylesheet" href="../../../../../../css/highlight/style1.css">
 
-          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
-          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
-          Array.from($tabMenuContainer.querySelectorAll('a'))
-              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
-              .forEach($content => $content.classList.add('is-hidden'));
+        
+<link rel="stylesheet" href="../../../../../../css/reset.css">
 
-          if ($tabMenu) {
-              $tabMenu.parentElement.classList.add('is-active');
-          }
-          const $activeTab = document.querySelector(id);
-          if ($activeTab) {
-              $activeTab.classList.remove('is-hidden');
-          }
-      }
-      switchTab();
-      window.addEventListener('hashchange', switchTab, false);
-  })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
-</head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="../../../../../../index.html">Home</a><a class="navbar-item" href="../../../../../../archives">Archives</a><a class="navbar-item" href="../../../../../../categories">Categories</a><a class="navbar-item" href="../../../../../../tags">Tags</a><a class="navbar-item" href="../../../../../../about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="Catalogue" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="Search" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item">Posted&nbsp;<time dateTime="2022-03-10T18:45:12.000Z" title="2022/3/11 02:45:12">2022-03-11</time></span><span class="level-item">Updated&nbsp;<time dateTime="2023-07-02T05:38:42.932Z" title="2023/7/2 13:38:42">2023-07-02</time></span><span class="level-item"><a class="link-muted" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/">JVM调优合集</a></span><span class="level-item">19 minutes read (About 2898 words)</span></div></div><h1 class="title is-3 is-size-4-mobile">jvm系列(六):jvm调优-工具篇</h1><div class="content"><h1 id="jvm系列六jvm调优-工具篇">jvm系列(六):jvm调优-工具篇</h1>
+        
+<link rel="stylesheet" href="../../../../../../css/markdown.css">
+
+        
+<link rel="stylesheet" href="../../../../../../css/fonts.css">
+ 
+         <!--注意：首页既不是post也不是page-->
+        
+        
+        
+<link rel="stylesheet" href="../../../../../../css/ui.css">
+ 
+        
+<link rel="stylesheet" href="../../../../../../css/style.css">
+
+
+        
+            <!--返回顶部css-->
+            
+<link rel="stylesheet" href="../../../../../../css/returnToTop.css">
+
+            
+<link rel="stylesheet" href="../../../../../../css/unicons.css">
+
+        
+        
+            <!--目录-->
+            
+<link rel="stylesheet" href="../../../../../../css/toc.css">
+
+        
+    
+
+    
+        
+<link rel="stylesheet" href="../../../../../../css/returnToLastPage.css">
+
+    
+    
+   
+<link rel="stylesheet" href="../../../../../../css/lightgallery-bundle.min.css">
+
+
+   
+        
+<link rel="stylesheet" href="../../../../../../css/custom.css">
+
+    
+
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="atom.xml" title="blog" type="application/atom+xml">
+</head>
+    
+    
+        <style>
+            .index-main{
+                max-width:  880px;
+            }
+        </style>
+
+    
+    
+
+
+
+    
+
+    
+    
+
+
+
+
+    
+    
+    
+    <body>
+        <script src="/js/darkmode-js.min.js"></script>
+        
+        <script>
+            const options = {
+                bottom: '40px', // default: '32px'
+                right: 'unset', // default: '32px'
+                left: '42px', // default: 'unset'
+                time: '0.3s', // default: '0.3s'
+                mixColor: '#fff', // default: '#fff'
+                backgroundColor: ' #e4e4e4 ',  // default: '#fff'
+                buttonColorDark: '#100f2c',  // default: '#100f2c'
+                buttonColorLight: '#fff', // default: '#fff'
+                saveInCookies: true, // default: true,
+                label: '🌓', // default: ''
+                autoMatchOsTheme: true // default: true
+            }
+            const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+        </script>
+        
+        
+            <div class="left-toc-container">
+                <nav id="toc" class="bs-docs-sidebar"></nav>
+            </div>
+        
+        <div class="paper">
+            
+            
+            
+            
+                <div class="shadow-drop-2-bottom paper-main">
+                    
+
+
+<div class="header">
+    <div class="header-container">
+        <style>
+            .header-img {
+                width: 56px;
+                height: auto;
+                object-fit: cover; /* 保持图片比例 */
+                transition: transform 0.3s ease-in-out; 
+                border-radius: 0; 
+            }
+            
+        </style>
+        <img 
+            alt="^-^" 
+            cache-control="max-age=86400" 
+            class="header-img" 
+            src="../../../../../../img/favicon.webp" 
+        />
+        <div class="header-content">
+            <a class="logo" href="../../../../../../index.html">blog</a> 
+            <span class="description"></span> 
+        </div>
+    </div>
+    
+   
+    <ul class="nav">
+        
+            
+                <li><a href="../../../../../../index.html">首页</a></li>
+            
+        
+            
+                <li><a href="../../../../../../list/">文章</a></li>
+            
+        
+            
+                <li><a href="../../../../../../about/">关于</a></li>
+            
+        
+            
+                <li><a href="../../../../../../tags/">标签</a></li>
+            
+        
+    </ul>
+</div> 
+        
+                    
+                    
+
+                    
+                    
+                    
+                    <!--说明是文章post页面-->
+                    
+                        <div class="post-main">
+    
+
+    
+        
+            
+                <div class="post-main-title" style="text-align: center;">
+                    jvm系列(六):jvm调优-工具篇
+                </div>
+            
+        
+      
+    
+
+    
+
+        
+            <div class="post-head-meta-center">
+        
+                
+                    <span>最近更新：2023-07-02</span> 
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                     <span>字数总计：2.6k</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span>阅读估时：9分钟</span>
+                
+                
+                    
+                        &nbsp; | &nbsp;
+                    
+                    <span id="busuanzi_container_page_pv">
+                        阅读量：<span id="busuanzi_value_page_pv"></span>次
+                    </span>
+                
+            </div>
+    
+
+    <div class="post-md">
+        
+            
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#jvm%E7%B3%BB%E5%88%97%E5%85%ADjvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87"><span class="post-toc-text">jvm系列(六):jvm调优-工具篇</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#jdk%E8%87%AA%E5%B8%A6%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="post-toc-text">jdk自带的工具</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#jconsole"><span class="post-toc-text">jconsole</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#visualvm"><span class="post-toc-text">VisualVM</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E8%B0%83%E4%BC%98%E5%B7%A5%E5%85%B7"><span class="post-toc-text">第三方调优工具</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#mat"><span class="post-toc-text">MAT</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#gchisto"><span class="post-toc-text">GChisto</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#gcviewer"><span class="post-toc-text">gcviewer</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#gc-easy"><span class="post-toc-text">GC Easy</span></a></li></ol></li></ol></li></ol>
+            
+        
+        <div class=".article-gallery"><h1 id="jvm系列六jvm调优-工具篇">jvm系列(六):jvm调优-工具篇</h1>
 <p>16年的时候花了一些时间整理了一些关于jvm的介绍文章,到现在回顾起来还是一些还没有补充全面，其中就包括如何利用工具来监控调优前后的性能变化。工具做为图形化界面来展示更能直观的发现问题，另一方面一些耗费性能的分析（dump文件分析）一般也不会在生产直接分析，往往dump下来的文件达1G左右，人工分析效率较低，因此利用工具来分析jvm相关问题，长长可以到达事半功倍的效果来。</p>
 <p>jvm监控分析工具一般分为两类，一种是jdk自带的工具，一种是第三方的分析工具。jdk自带工具一般在jdk
 bin目录下面，以exe的形式直接点击就可以使用，其中包含分析工具已经很强大，几乎涉及了方方面面，但是我们最常使用的只有两款：jconsole.exe和jvisualvm.exe；第三方的分析工具有很多，各自的侧重点不同，比较有代表性的：MAT(Memory
@@ -47,7 +248,7 @@ management
 extensions）的GUI性能监测工具。jconsole使用jvm的扩展机制获取并展示虚拟机中运行的应用程序的性能和资源消耗等信息。</p>
 <p>直接在jdk/bin目录下点击jconsole.exe即可启动，界面如下:</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131022.png" alt="微信截图_20230702131022">
+<a href="微信截图_20230702131022.png" title="微信截图_20230702131022" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131022.png" alt="微信截图_20230702131022"></a>
 <figcaption aria-hidden="true">微信截图_20230702131022</figcaption>
 </figure>
 <p>在弹出的框中可以选择本机的监控本机的java应用，也可以选择远程的java服务来监控，如果监控远程服务需要在tomcat启动脚本中添加如下代码：</p>
@@ -61,21 +262,21 @@ extensions）的GUI性能监测工具。jconsole使用jvm的扩展机制获取�
 <li>概述，以图表的方式显示出堆内存使用量，活动线程数，已加载的类，CUP占用率的折线图，可以非常清晰的观察在程序执行过程中的变动情况。</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131109.png" alt="微信截图_20230702131109">
+<a href="微信截图_20230702131109.png" title="微信截图_20230702131109" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131109.png" alt="微信截图_20230702131109"></a>
 <figcaption aria-hidden="true">微信截图_20230702131109</figcaption>
 </figure>
 <ul>
 <li>内存，主要展示了内存的使用情况，同时可以查看堆和非堆内存的变化值对比，也可以点击执行GC来处罚GC的执行</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131138.png" alt="微信截图_20230702131138">
+<a href="微信截图_20230702131138.png" title="微信截图_20230702131138" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131138.png" alt="微信截图_20230702131138"></a>
 <figcaption aria-hidden="true">微信截图_20230702131138</figcaption>
 </figure>
 <ul>
 <li>线程，主界面展示线程数的活动数和峰值，同时点击左下方线程可以查看线程的详细信息，比如线程的状态是什么，堆栈内容等，同时也可以点击“检测死锁”来检查线程之间是否有死锁的情况。</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131215.png" alt="微信截图_20230702131215">
+<a href="微信截图_20230702131215.png" title="微信截图_20230702131215" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131215.png" alt="微信截图_20230702131215"></a>
 <figcaption aria-hidden="true">微信截图_20230702131215</figcaption>
 </figure>
 <ul>
@@ -98,12 +299,12 @@ JVM
 是javajdk自带的最牛逼的调优工具了吧，也是我平时使用最多调优工具，几乎涉及了jvm调优的方方面面。同样是在jdk/bin目录下面双击jvisualvm.exe既可使用，启动起来后和jconsole
 一样同样可以选择本地和远程，如果需要监控远程同样需要配置相关参数，主界面如下；</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131301.png" alt="微信截图_20230702131301">
+<a href="微信截图_20230702131301.png" title="微信截图_20230702131301" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131301.png" alt="微信截图_20230702131301"></a>
 <figcaption aria-hidden="true">微信截图_20230702131301</figcaption>
 </figure>
 <p>VisualVM可以根据需要安装不同的插件，每个插件的关注点都不同，有的主要监控GC，有的主要监控内存，有的监控线程等。</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131341.png" alt="微信截图_20230702131341">
+<a href="微信截图_20230702131341.png" title="微信截图_20230702131341" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131341.png" alt="微信截图_20230702131341"></a>
 <figcaption aria-hidden="true">微信截图_20230702131341</figcaption>
 </figure>
 <p>如何安装：</p>
@@ -115,30 +316,30 @@ JVM
 <p>我这里以 Eclipse(pid
 22296)为例，双击后直接展开，主界面展示了系统和jvm两大块内容，点击右下方jvm参数和系统属性可以参考详细的参数信息.</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131410.png" alt="微信截图_20230702131410">
+<a href="微信截图_20230702131410.png" title="微信截图_20230702131410" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131410.png" alt="微信截图_20230702131410"></a>
 <figcaption aria-hidden="true">微信截图_20230702131410</figcaption>
 </figure>
 <p>因为VisualVM的插件太多，我这里主要介绍三个我主要使用几个：监控、线程、Visual
 GC</p>
 <p>监控的主页其实也就是，cpu、内存、类、线程的图表</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131445.png" alt="微信截图_20230702131445">
+<a href="微信截图_20230702131445.png" title="微信截图_20230702131445" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131445.png" alt="微信截图_20230702131445"></a>
 <figcaption aria-hidden="true">微信截图_20230702131445</figcaption>
 </figure>
 <p>线程和jconsole功能没有太大的区别</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131520.png" alt="微信截图_20230702131520">
+<a href="微信截图_20230702131520.png" title="微信截图_20230702131520" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131520.png" alt="微信截图_20230702131520"></a>
 <figcaption aria-hidden="true">微信截图_20230702131520</figcaption>
 </figure>
 <p>Visual GC
 是常常使用的一个功能，可以明显的看到年轻代、老年代的内存变化，以及gc频率、gc的时间等。</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131559.png" alt="微信截图_20230702131559">
+<a href="微信截图_20230702131559.png" title="微信截图_20230702131559" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131559.png" alt="微信截图_20230702131559"></a>
 <figcaption aria-hidden="true">微信截图_20230702131559</figcaption>
 </figure>
 <p>以上的功能其实jconsole几乎也有，VisualVM更全面更直观一些，另外VisualVM非常多的其它功能，可以分析dump的内存快照，dump出来的线程快照并且进行分析等，还有其它很多的插件大家可以去探索</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131630.png" alt="微信截图_20230702131630">
+<a href="微信截图_20230702131630.png" title="微信截图_20230702131630" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131630.png" alt="微信截图_20230702131630"></a>
 <figcaption aria-hidden="true">微信截图_20230702131630</figcaption>
 </figure>
 <h2 id="第三方调优工具">第三方调优工具</h2>
@@ -155,7 +356,7 @@ Analyzer）被认为是一个“傻瓜式“的堆转储文件分析工具，你
 插件的形式来安装，具体的安装过程就不在描述了，可以利用visualvm或者是
 jmap命令生产堆文件，导入eclipse mat中生成分析报告：</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131714.png" alt="微信截图_20230702131714">
+<a href="微信截图_20230702131714.png" title="微信截图_20230702131714" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131714.png" alt="微信截图_20230702131714"></a>
 <figcaption aria-hidden="true">微信截图_20230702131714</figcaption>
 </figure>
 <p>生产这会报表的同时也会在dump文件的同级目录下生成三份（dump_Top_Consumers.zip、dump_Leak_Suspects.zip、dump_Top_Components.zip）分析结果的html文件，方便发送给相关同事来查看。</p>
@@ -165,7 +366,7 @@ jmap命令生产堆文件，导入eclipse mat中生成分析报告：</p>
 size</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131742.png" alt="微信截图_20230702131742">
+<a href="微信截图_20230702131742.png" title="微信截图_20230702131742" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131742.png" alt="微信截图_20230702131742"></a>
 <figcaption aria-hidden="true">微信截图_20230702131742</figcaption>
 </figure>
 <ul>
@@ -173,14 +374,14 @@ size</li>
 （大小是以Retained Heap为标准排序的）</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131822.png" alt="微信截图_20230702131822">
+<a href="微信截图_20230702131822.png" title="微信截图_20230702131822" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131822.png" alt="微信截图_20230702131822"></a>
 <figcaption aria-hidden="true">微信截图_20230702131822</figcaption>
 </figure>
 <ul>
 <li>Top Consumers ： 通过图形列出最大的object</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131852.png" alt="微信截图_20230702131852">
+<a href="微信截图_20230702131852.png" title="微信截图_20230702131852" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131852.png" alt="微信截图_20230702131852"></a>
 <figcaption aria-hidden="true">微信截图_20230702131852</figcaption>
 </figure>
 <ul>
@@ -188,14 +389,14 @@ size</li>
 <li>Leak Suspects ：内存泄漏分析</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131931.png" alt="微信截图_20230702131931">
+<a href="微信截图_20230702131931.png" title="微信截图_20230702131931" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131931.png" alt="微信截图_20230702131931"></a>
 <figcaption aria-hidden="true">微信截图_20230702131931</figcaption>
 </figure>
 <ul>
 <li>Top Components: 列出大于总堆数的百分之1的报表。</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131959.png" alt="微信截图_20230702131959">
+<a href="微信截图_20230702131959.png" title="微信截图_20230702131959" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702131959.png" alt="微信截图_20230702131959"></a>
 <figcaption aria-hidden="true">微信截图_20230702131959</figcaption>
 </figure>
 <ul>
@@ -209,7 +410,7 @@ gc的时间、频率等等，通过列表、报表、图表等不同的形式来
 <p>配置好本地的jdk环境之后，双击GChisto.jar,在弹出的输入框中点击 add
 选择gc.log日志</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132030.png" alt="微信截图_20230702132030">
+<a href="微信截图_20230702132030.png" title="微信截图_20230702132030" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132030.png" alt="微信截图_20230702132030"></a>
 <figcaption aria-hidden="true">微信截图_20230702132030</figcaption>
 </figure>
 <ul>
@@ -217,7 +418,7 @@ gc的时间、频率等等，通过列表、报表、图表等不同的形式来
 的次数、GC的时间、GC的开销、最大GC时间和最小GC时间等，以及相应的柱状图</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132056.png" alt="微信截图_20230702132056">
+<a href="微信截图_20230702132056.png" title="微信截图_20230702132056" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132056.png" alt="微信截图_20230702132056"></a>
 <figcaption aria-hidden="true">微信截图_20230702132056</figcaption>
 </figure>
 <ul>
@@ -226,7 +427,7 @@ Distribution:查看GC停顿的详细分布，x轴表示垃圾收集停顿时间�
 <li>GC Timeline：显示整个时间线上的垃圾收集</li>
 </ul>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132132.png" alt="微信截图_20230702132132">
+<a href="微信截图_20230702132132.png" title="微信截图_20230702132132" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132132.png" alt="微信截图_20230702132132"></a>
 <figcaption aria-hidden="true">微信截图_20230702132132</figcaption>
 </figure>
 <p>不过这款工具已经不再维护，不能识别最新jdk的日志文件。</p>
@@ -235,71 +436,194 @@ Distribution:查看GC停顿的详细分布，x轴表示垃圾收集停顿时间�
 BEA Java 虚拟机产生的垃圾收集器的日志，gcviewer个人感觉显示
 的界面比较乱没有GChisto更专业一些。</p>
 <figure>
-<img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132155.png" alt="微信截图_20230702132155">
+<a href="微信截图_20230702132155.png" title="微信截图_20230702132155" class="gallery-item" style="box-shadow: none;"> <img src="/2022/03/11/JVM/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/jvm%E7%B3%BB%E5%88%97(%E5%85%AD)jvm%E8%B0%83%E4%BC%98-%E5%B7%A5%E5%85%B7%E7%AF%87//微信截图_20230702132155.png" alt="微信截图_20230702132155"></a>
 <figcaption aria-hidden="true">微信截图_20230702132155</figcaption>
 </figure>
 <h3 id="gc-easy">GC Easy</h3>
 <p>这是一个web工具,在线使用非常方便.</p>
 <p>地址: http://gceasy.io</p>
 <p>进入官网，讲打包好的zip或者gz为后缀的压缩包上传，过一会就会拿到分析结果。</p>
-</div><div class="article-licensing box"><div class="licensing-title"><p>jvm系列(六):jvm调优-工具篇</p><p><a href="https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(六)jvm调优-工具篇/">https://0914ds.github.io/2022/03/11/JVM/JVM调优合集/jvm系列(六)jvm调优-工具篇/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>Author</h6><p>albert dong</p></div></div><div class="level-item is-narrow"><div><h6>Posted on</h6><p>2022-03-11</p></div></div><div class="level-item is-narrow"><div><h6>Updated on</h6><p>2023-07-02</p></div></div><div class="level-item is-narrow"><div><h6>Licensed under</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="notification is-danger">You need to set <code>install_url</code> to use ShareThis. Please set it in <code>_config.yml</code>.</div></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">Like this article? Support the author with</h3><div class="buttons is-centered"><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="afdian"><span class="icon is-small"><i class="fas fa-charging-station"></i></span><span>Afdian.net</span></a><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>Alipay</span><span class="qrcode"><img src="../../../../../../" alt="Alipay"></span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="buymeacoffee"><span class="icon is-small"><i class="fas fa-coffee"></i></span><span>Buy me a coffee</span></a><a class="button donate" href="../../../../../../" target="_blank" rel="noopener" data-type="patreon"><span class="icon is-small"><i class="fab fa-patreon"></i></span><span>Patreon</span></a><div class="notification is-danger">You forgot to set the <code>business</code> or <code>currency_code</code> for Paypal. Please set it in <code>_config.yml</code>.</div><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>Wechat</span><span class="qrcode"><img src="../../../../../../" alt="Wechat"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">jvm系列(五):Java GC 分析</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="../jvm%E7%B3%BB%E5%88%97(%E5%9B%9B)jvm%E8%B0%83%E4%BC%98-%E5%91%BD%E4%BB%A4%E7%AF%87/"><span class="level-item">jvm系列(四):jvm调优-命令篇</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">Comments</h3><div class="notification is-danger">You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.</div></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar is-rounded" src="../../../../../../img/avatar.png" alt="albert"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">albert</p><p class="is-size-6 is-block">albert</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>shanghai</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">Posts</p><a href="../../../../../../archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Categories</p><a href="../../../../../../categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">Tags</p><a href="../../../../../../tags"><p class="title">0</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/0914ds" target="_blank" rel="noopener">Follow</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/ppoffice"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="../../../../../../index.html"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">Catalogue</h3><ul class="menu-list"><li><a class="level is-mobile" href="#jvm系列六jvm调优-工具篇"><span class="level-left"><span class="level-item">1</span><span class="level-item">jvm系列(六):jvm调优-工具篇</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#jdk自带的工具"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">jdk自带的工具</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#jconsole"><span class="level-left"><span class="level-item">1.1.1</span><span class="level-item">jconsole</span></span></a></li><li><a class="level is-mobile" href="#visualvm"><span class="level-left"><span class="level-item">1.1.2</span><span class="level-item">VisualVM</span></span></a></li></ul></li><li><a class="level is-mobile" href="#第三方调优工具"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">第三方调优工具</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#mat"><span class="level-left"><span class="level-item">1.2.1</span><span class="level-item">MAT</span></span></a></li><li><a class="level is-mobile" href="#gchisto"><span class="level-left"><span class="level-item">1.2.2</span><span class="level-item">GChisto</span></span></a></li><li><a class="level is-mobile" href="#gcviewer"><span class="level-left"><span class="level-item">1.2.3</span><span class="level-item">gcviewer</span></span></a></li><li><a class="level is-mobile" href="#gc-easy"><span class="level-left"><span class="level-item">1.2.4</span><span class="level-item">GC Easy</span></span></a></li></ul></li></ul></li></ul></div></div><style>#toc .menu-list > li > a.is-active + .menu-list { display: block; }#toc .menu-list > li > a + .menu-list { display: none; }</style><script src="../../../../../../js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">Links</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://hexo.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Hexo</span></span><span class="level-right"><span class="level-item tag">hexo.io</span></span></a></li><li><a class="level is-mobile" href="https://bulma.io" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Bulma</span></span><span class="level-right"><span class="level-item tag">bulma.io</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">Categories</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/"><span class="level-start"><span class="level-item">JVM调优合集</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E5%AE%B9%E5%99%A8/"><span class="level-start"><span class="level-item">容器</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="level-start"><span class="level-item">数据库</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"><span class="level-start"><span class="level-item">机器学习</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/"><span class="level-start"><span class="level-item">消息中间件</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">Recents</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T17:13:16.000Z">2023-08-18</time></p><p class="title"><a href="../../../../../../2023/08/18/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-17T05:13:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">多元线性回归</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-08-16T17:30:16.000Z">2023-08-17</time></p><p class="title"><a href="../../../../../../2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/3-%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E4%BC%98%E5%8C%96/">梯度下降优化</a></p><p class="categories"><a href="../../../../../../categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-17T06:13:16.000Z">2023-06-17</time></p><p class="title"><a href="../../../../../../2023/06/17/%E6%B6%88%E6%81%AF/kafka/">kafka</a></p><p class="categories"><a href="../../../../../../categories/%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/">消息中间件</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2023-06-05T07:02:29.235Z">2023-06-05</time></p><p class="title"><a href="../../../../../../2023/06/05/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql/mysql%E7%9A%84%E9%94%81%E6%9C%BA%E5%88%B6/">mysql的锁机制</a></p><p class="categories"><a href="../../../../../../categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">Archives</h3><ul class="menu-list"><li><a class="level is-mobile" href="../../../../../../archives/2023/08/"><span class="level-start"><span class="level-item">August 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/06/"><span class="level-start"><span class="level-item">June 2023</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2023/05/"><span class="level-start"><span class="level-item">May 2023</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="../../../../../../archives/2022/03/"><span class="level-start"><span class="level-item">March 2022</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li></ul></div></div></div><!--!--></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="../../../../../../index.html"><img src="../../../../../../img/logo.svg" alt="blog" height="28"></a><p class="is-size-7"><span>&copy; 2023 albert dong</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p><p class="is-size-7">© 2019</p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("en");</script><script>var IcarusThemeSettings = {
-            article: {
-                highlight: {
-                    clipboard: true,
-                    fold: 'unfolded'
-                }
-            }
-        };</script><script src="../../../../../../js/column.js"></script><script src="../../../../../../js/animation.js"></script><a id="back-to-top" title="Back to top" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="../../../../../../js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
-      window.cookieconsent.initialise({
-        type: "info",
-        theme: "edgeless",
-        static: false,
-        position: "bottom-left",
-        content: {
-          message: "This website uses cookies to improve your experience.",
-          dismiss: "Got it!",
-          allow: "Allow cookies",
-          deny: "Decline",
-          link: "Learn more",
-          policy: "Cookie Policy",
-          href: "https://www.cookiesandyou.com/",
-        },
-        palette: {
-          popup: {
-            background: "#edeff5",
-            text: "#838391"
-          },
-          button: {
-            background: "#4b81e8"
-          },
-        },
-      });
-    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
-            if (typeof $.fn.lightGallery === 'function') {
-                $('.article').lightGallery({ selector: '.gallery-item' });
-            }
-            if (typeof $.fn.justifiedGallery === 'function') {
-                if ($('.justified-gallery > p > .gallery-item').length) {
-                    $('.justified-gallery > p > .gallery-item').unwrap();
-                }
-                $('.justified-gallery').justifiedGallery();
-            }
-        });</script><!--!--><!--!--><script type="text/x-mathjax-config">MathJax.Hub.Config({
-            'HTML-CSS': {
-                matchFontHeight: false
-            },
-            SVG: {
-                matchFontHeight: false
-            },
-            CommonHTML: {
-                matchFontHeight: false
-            },
-            tex2jax: {
-                inlineMath: [
-                    ['$','$'],
-                    ['\\(','\\)']
-                ]
-            }
-        });</script><script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.9/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script><!--!--><!--!--><!--!--><script src="../../../../../../js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="Type something..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="../../../../../../js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
-            loadInsight({"contentUrl":"../../../../../../content.json"}, {"hint":"Type something...","untitled":"(Untitled)","posts":"Posts","pages":"Pages","categories":"Categories","tags":"Tags"});
-        });</script></body></html>
+</div>
+    </div>
+
+    <div class="post-meta">
+        <i>
+        
+            <span>2022-03-11</span>
+            
+                <span>该篇文章被 albert dong</span>
+            
+            
+             
+                <span>归为分类:
+                    
+                    
+                        <a href='../../../../../../categories/JVM%E8%B0%83%E4%BC%98%E5%90%88%E9%9B%86/'>
+                            JVM调优合集
+                        </a>
+                    
+                </span>
+            
+        
+        </i>
+    </div>
+    <br>
+    
+    
+        
+            
+    
+            <div class="post-footer-pre-next">
+                
+                    <span>上一篇：<a href='../jvm%E7%B3%BB%E5%88%97(%E4%BA%8C)JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/'>jvm系列(二):JVM内存结构</a></span>
+                
+
+                
+                    <span class="post-footer-pre-next-last-span-right">下一篇：<a href="../jvm%E7%B3%BB%E5%88%97(%E4%BA%94)Java%20GC%20%E5%88%86%E6%9E%90/">jvm系列(五):Java GC 分析</a>
+                    </span>
+                
+            </div>
+    
+        
+    
+
+    
+        
+
+     
+</div>
+
+
+
+                                      
+                    
+                    
+                    <div class="footer">
+    
+        <span> 
+            © 1949-2024 China 
+
+            
+                
+
+            
+        </span>
+       
+    
+</div>
+
+
+
+<!--这是指一条线往下的内容-->
+<div class="footer-last">
+    
+            <span>🌊看过大海的人不会忘记海的广阔🌊</span>
+            
+                <span class="footer-last-span-right"><i>本站由<a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/index.html">Hexo</a>驱动｜使用<a target="_blank" rel="noopener" href="https://github.com/HiNinoJay/hexo-theme-A4">Hexo-theme-A4</a>主题</i></span>
+            
+    
+</div>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!--目录-->
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js" type="text/javascript" ></script>
+        
+<script src="../../../../../../js/toc.js"></script>
+
+    
+
+    
+<script src="../../../../../../js/randomHeaderContent.js"></script>
+
+    <!--回到顶部按钮-->
+    
+        
+<script src="../../../../../../js/returnToTop.js"></script>
+
+    
+
+    
+        
+<script src="../../../../../../js/returnToLastPage.js"></script>
+
+    
+
+
+
+
+
+<script src="../../../../../../js/lightgallery/lightgallery.umd.min.js"></script>
+
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-thumbnail.umd.min.js"></script>
+
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-fullscreen.umd.min.js"></script>
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-autoplay.umd.min.js"></script>
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-zoom.umd.min.js"></script>
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-rotate.umd.min.js"></script>
+
+
+<script src="../../../../../../js/lightgallery/plugins/lg-paper.umd.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+     
+    if (typeof lightGallery !== "undefined") {
+        var options1 = {
+            selector: '.gallery-item',
+            plugins: [lgThumbnail, lgFullscreen, lgAutoplay, lgZoom, lgRotate, lgPager], // 启用插件
+            thumbnail: true,          // 显示缩略图
+            zoom: true,               // 启用缩放功
+            rotate: true,             // 启用旋转功能能
+            autoplay: true,        // 启用自动播放功能
+            fullScreen: true,      // 启用全屏功能
+            pager: false, //页码,
+            zoomFromOrigin: true,   // 从原始位置缩放
+            actualSize: true,       // 启用查看实际大小的功能
+            enableZoomAfter: 300,    // 延迟缩放，确保图片加载完成后可缩放
+        };
+        lightGallery(document.getElementsByClassName('.article-gallery')[0], options1); // 修复选择器
+    }
+    
+</script>
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script> 
+
+                </div>
+            
+            
+                <!-- 回到顶部的按钮-->  
+                <div class="progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+            
+                <!-- 返回的按钮-->  
+                <div class="return-to-last-progress-wrap shadow-drop-2-bottom">
+                    <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+                        <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"/>
+                    </svg>
+                </div>
+            
+    </body>
+</html>
