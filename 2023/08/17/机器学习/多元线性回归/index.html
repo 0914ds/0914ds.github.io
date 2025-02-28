@@ -212,7 +212,7 @@
                     
                         &nbsp; | &nbsp;
                     
-                    <span>阅读估时：20分钟</span>
+                    <span>阅读估时：19分钟</span>
                 
                 
                     
@@ -228,456 +228,285 @@
     <div class="post-md">
         
             
-                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">多元线性回归</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-text">1、基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%80%BC"><span class="post-toc-text">1.1、连续值</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">1.3、简单线性回归</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9C%80%E4%BC%98%E8%A7%A3"><span class="post-toc-text">1.4、最优解</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92-1"><span class="post-toc-text">1.5、多元线性回归</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B"><span class="post-toc-text">2、正规方程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95%E7%9F%A9%E9%98%B5%E8%A1%A8%E7%A4%BA"><span class="post-toc-text">2.1、最小二乘法矩阵表示</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%A4%9A%E5%85%83%E4%B8%80%E6%AC%A1%E6%96%B9%E7%A8%8B%E4%B8%BE%E4%BE%8B"><span class="post-toc-text">2.2、多元一次方程举例</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E7%9F%A9%E9%98%B5%E8%BD%AC%E7%BD%AE%E5%85%AC%E5%BC%8F%E4%B8%8E%E6%B1%82%E5%AF%BC%E5%85%AC%E5%BC%8F"><span class="post-toc-text">2.3、矩阵转置公式与求导公式：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%8E%A8%E5%AF%BC%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B-theta-%E7%9A%84%E8%A7%A3"><span class="post-toc-text">2.4、推导正规方程 \(\theta\) 的解：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%87%B8%E5%87%BD%E6%95%B0%E5%88%A4%E5%AE%9A"><span class="post-toc-text">2.5、凸函数判定</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E7%AE%97%E6%B3%95%E6%8E%A8%E5%AF%BC"><span class="post-toc-text">3、线性回归算法推导</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%9B%9E%E5%BD%92"><span class="post-toc-text">3.1、深入理解回归</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90"><span class="post-toc-text">3.2、误差分析</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9C%80%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1"><span class="post-toc-text">3.3、最大似然估计</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83-%E6%A6%82%E7%8E%87%E5%AF%86%E5%BA%A6%E5%87%BD%E6%95%B0"><span class="post-toc-text">3.4、高斯分布-概率密度函数</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E8%AF%AF%E5%B7%AE%E6%80%BB%E4%BC%BC%E7%84%B6"><span class="post-toc-text">3.5、误差总似然</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95mse"><span class="post-toc-text">3.6、最小二乘法MSE</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E5%BD%92%E7%BA%B3%E6%80%BB%E7%BB%93%E5%8D%87%E5%8D%8E"><span class="post-toc-text">3.7、归纳总结升华</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E5%AE%9E%E6%88%98"><span class="post-toc-text">4、线性回归实战</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E4%BD%BF%E7%94%A8%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B%E8%BF%9B%E8%A1%8C%E6%B1%82%E8%A7%A3"><span class="post-toc-text">4.1、使用正规方程进行求解</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92-1"><span class="post-toc-text">4.1.1、简单线性回归</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92-2"><span class="post-toc-text">4.1.2、多元线性回归</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%BA%93scikit-learn"><span class="post-toc-text">4.2、机器学习库scikit-learn</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#scikit-learn%E7%AE%80%E4%BB%8B"><span class="post-toc-text">4.2.1、scikit-learn简介</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#scikit-learn%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.2.2、scikit-learn实现简单线性回归</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#scikit-learn%E5%AE%9E%E7%8E%B0%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.2.3、scikit-learn实现多元线性回归</span></a></li></ol></li></ol></li></ol></li></ol>
+                <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">多元线性回归</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1%E3%80%81%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="post-toc-text">1、基本概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-1%E3%80%81%E8%BF%9E%E7%BB%AD%E5%80%BC"><span class="post-toc-text">1.1、连续值</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-2%E3%80%81%E7%A6%BB%E6%95%A3%E5%80%BC"><span class="post-toc-text">1.2、离散值</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-3%E3%80%81%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">1.3、简单线性回归</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-4%E3%80%81%E6%9C%80%E4%BC%98%E8%A7%A3"><span class="post-toc-text">1.4、最优解</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#1-5%E3%80%81%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">1.5、多元线性回归</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2%E3%80%81%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B"><span class="post-toc-text">2、正规方程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-1%E3%80%81%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95%E7%9F%A9%E9%98%B5%E8%A1%A8%E7%A4%BA"><span class="post-toc-text">2.1、最小二乘法矩阵表示</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-2%E3%80%81%E5%A4%9A%E5%85%83%E4%B8%80%E6%AC%A1%E6%96%B9%E7%A8%8B%E4%B8%BE%E4%BE%8B"><span class="post-toc-text">2.2、多元一次方程举例</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-3%E3%80%81%E7%9F%A9%E9%98%B5%E8%BD%AC%E7%BD%AE%E5%85%AC%E5%BC%8F%E4%B8%8E%E6%B1%82%E5%AF%BC%E5%85%AC%E5%BC%8F%EF%BC%9A"><span class="post-toc-text">2.3、矩阵转置公式与求导公式：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-4%E3%80%81%E6%8E%A8%E5%AF%BC%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B-theta-%E7%9A%84%E8%A7%A3%EF%BC%9A"><span class="post-toc-text">2.4、推导正规方程 $\theta$ 的解：</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#2-5%E3%80%81%E5%87%B8%E5%87%BD%E6%95%B0%E5%88%A4%E5%AE%9A"><span class="post-toc-text">2.5、凸函数判定</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3%E3%80%81%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E7%AE%97%E6%B3%95%E6%8E%A8%E5%AF%BC"><span class="post-toc-text">3、线性回归算法推导</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-1%E3%80%81%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%9B%9E%E5%BD%92"><span class="post-toc-text">3.1、深入理解回归</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-2%E3%80%81%E8%AF%AF%E5%B7%AE%E5%88%86%E6%9E%90"><span class="post-toc-text">3.2、误差分析</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-3%E3%80%81%E6%9C%80%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1"><span class="post-toc-text">3.3、最大似然估计</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-4%E3%80%81%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83-%E6%A6%82%E7%8E%87%E5%AF%86%E5%BA%A6%E5%87%BD%E6%95%B0"><span class="post-toc-text">3.4、高斯分布-概率密度函数</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-5%E3%80%81%E8%AF%AF%E5%B7%AE%E6%80%BB%E4%BC%BC%E7%84%B6"><span class="post-toc-text">3.5、误差总似然</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-6%E3%80%81%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95MSE"><span class="post-toc-text">3.6、最小二乘法MSE</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#3-7%E3%80%81%E5%BD%92%E7%BA%B3%E6%80%BB%E7%BB%93%E5%8D%87%E5%8D%8E"><span class="post-toc-text">3.7、归纳总结升华</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4%E3%80%81%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E5%AE%9E%E6%88%98"><span class="post-toc-text">4、线性回归实战</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-1%E3%80%81%E4%BD%BF%E7%94%A8%E6%AD%A3%E8%A7%84%E6%96%B9%E7%A8%8B%E8%BF%9B%E8%A1%8C%E6%B1%82%E8%A7%A3"><span class="post-toc-text">4.1、使用正规方程进行求解</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#4-1-1%E3%80%81%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.1.1、简单线性回归</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#4-1-2%E3%80%81%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.1.2、多元线性回归</span></a></li></ol></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#4-2%E3%80%81%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%BA%93scikit-learn"><span class="post-toc-text">4.2、机器学习库scikit-learn</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#4-2-1%E3%80%81scikit-learn%E7%AE%80%E4%BB%8B"><span class="post-toc-text">4.2.1、scikit-learn简介</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#4-2-2%E3%80%81scikit-learn%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.2.2、scikit-learn实现简单线性回归</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#4-2-3%E3%80%81scikit-learn%E5%AE%9E%E7%8E%B0%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="post-toc-text">4.2.3、scikit-learn实现多元线性回归</span></a></li></ol></li></ol></li></ol></li></ol>
             
         
         <div class=".article-gallery"><meta name="referrer" content="no-referrer">
 <h2 id="多元线性回归">多元线性回归</h2>
-<h3 id="基本概念">1、基本概念</h3>
-<p>​ 线性回归是机器学习中<strong>有监督</strong>机器学习下的一种算法。
-<strong>回归问题</strong>主要关注的是<strong>因变量</strong>(需要预测的值，可以是一个也可以是多个)和一个或多个数值型的<strong>自变量</strong>(预测变量)之间的关系。</p>
+<h3 id="1、基本概念">1、基本概念</h3>
+<p>​    线性回归是机器学习中<strong>有监督</strong>机器学习下的一种算法。 <strong>回归问题</strong>主要关注的是<strong>因变量</strong>(需要预测的值，可以是一个也可以是多个)和一个或多个数值型的<strong>自变量</strong>(预测变量)之间的关系。</p>
 <p>需要预测的值:即目标变量，target，y，<strong>连续值</strong>预测变量。</p>
-<p>影响目标变量的因素：<span class="math inline">\(X_1\)</span>...<span class="math inline">\(X_n\)</span>，可以是连续值也可以是离散值。</p>
+<p>影响目标变量的因素：$X_1$…$X_n$，可以是连续值也可以是离散值。</p>
 <p>因变量和自变量之间的关系:即<strong>模型</strong>，model，是我们要求解的。</p>
-<h4 id="连续值">1.1、连续值</h4>
-<p><a href="b.png" title="b" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//b.png" alt="b"></a> #### 1.2、离散值</p>
-<figure>
-<a href="a.png" title="a" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//a.png" alt="a"></a>
-<figcaption aria-hidden="true">a</figcaption>
-</figure>
-<h4 id="简单线性回归">1.3、简单线性回归</h4>
+<h4 id="1-1、连续值">1.1、连续值</h4>
+<p><a href="b.png" title="b" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//b.png" alt="b"></a></p>
+<h4 id="1-2、离散值">1.2、离散值</h4>
+<p><a href="a.png" title="a" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//a.png" alt="a"></a></p>
+<h4 id="1-3、简单线性回归">1.3、简单线性回归</h4>
 <p>前面提到过，算法说白了就是公式，简单线性回归属于一个算法，它所对应的公式。</p>
-<p><span class="math display">\[y = wx + b\]</span></p>
-<p>这个公式中，y 是目标变量即未来要预测的值，x 是影响 y 的因素，w,b
-是公式上的参数即要求的模型。其实 b 就是咱们的截距，w 就是斜率嘛！
-所以很明显如果模型求出来了，未来影响 y 值的未知数就是一个 x
-值，也可以说影响 y 值
-的因素只有一个，所以这是就叫<strong>简单</strong>线性回归的原因。</p>
-<p>同时可以发现从 x 到 y 的计算，x
-只是一次方，所以这是算法叫<strong>线性</strong>回归的原因。
-其实，大家上小学时就已经会解这种一元一次方程了。为什么那个时候不叫人工智能算法呢？因为人工智能算法要求的是最优解！</p>
-<h4 id="最优解">1.4、最优解</h4>
+<p>$$y = wx + b$$</p>
+<p>这个公式中，y 是目标变量即未来要预测的值，x 是影响 y 的因素，w,b 是公式上的参数即要求的模型。其实 b 就是咱们的截距，w 就是斜率嘛！ 所以很明显如果模型求出来了，未来影响 y 值的未知数就是一个 x 值，也可以说影响 y 值 的因素只有一个，所以这是就叫<strong>简单</strong>线性回归的原因。</p>
+<p>同时可以发现从 x 到 y 的计算，x 只是一次方，所以这是算法叫<strong>线性</strong>回归的原因。 其实，大家上小学时就已经会解这种一元一次方程了。为什么那个时候不叫人工智能算法呢？因为人工智能算法要求的是最优解！</p>
+<h4 id="1-4、最优解">1.4、最优解</h4>
 <p>Actual value:<strong>真实值</strong>，一般使用 y 表示。</p>
-<p>Predicted value:<strong>预测值</strong>，是把已知的 x
-带入到公式里面和<strong>猜</strong>出来的参数 w,b 计算得到的，一般使用
-<span class="math inline">\(\hat{y}\)</span> 表示。</p>
-<p>Error:<strong>误差</strong>，预测值和真实值的差距，一般使用 <span class="math inline">\(\varepsilon\)</span> 表示。</p>
-<p><strong>最优解</strong>:尽可能的找到一个模型使得整体的误差最小，整体的误差通常叫做损失
-Loss。</p>
+<p>Predicted value:<strong>预测值</strong>，是把已知的 x 带入到公式里面和<strong>猜</strong>出来的参数 w,b 计算得到的，一般使用 $\hat{y}$ 表示。</p>
+<p>Error:<strong>误差</strong>，预测值和真实值的差距，一般使用 $\varepsilon$ 表示。</p>
+<p><strong>最优解</strong>:尽可能的找到一个模型使得整体的误差最小，整体的误差通常叫做损失 Loss。</p>
 <p>Loss:整体的误差，Loss 通过损失函数 Loss function 计算得到。</p>
-<figure>
-<a href="c.png" title="c" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//c.png" alt="c"></a>
-<figcaption aria-hidden="true">c</figcaption>
-</figure>
-<h4 id="多元线性回归-1">1.5、多元线性回归</h4>
-<p>现实生活中，往往影响结果 y 的因素不止一个，这时 x 就从一个变成了 n
-个，<span class="math inline">\(x_1\)</span>...<span class="math inline">\(x_n\)</span>
-同时简单线性回归的公式也就不在适用了。<strong>多元线性回归</strong>公式如下：</p>
-<p><span class="math inline">\(\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n +
-b\)</span></p>
-<p>b是截距，也可以使用<span class="math inline">\(w_0\)</span>来表示</p>
-<p><span class="math inline">\(\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n +
-w_0\)</span></p>
-<p><span class="math inline">\(\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n +
-w_0 * 1\)</span></p>
-<p>使用向量来表示，<span class="math inline">\(\vec{X}\)</span>表示所有的变量，是一维向量；<span class="math inline">\(\vec{W}\)</span>表示所有的系数（包含<span class="math inline">\(w_0\)</span>），是一维向量，根据向量乘法规律，可以这么写：</p>
-<p><span class="math inline">\(\hat{y} =
-W^TX\)</span>【默认情况下，向量都是列向量】</p>
-<figure>
-<a href="d.png" title="d" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//d.png" alt="d"></a>
-<figcaption aria-hidden="true">d</figcaption>
-</figure>
-<h3 id="正规方程">2、正规方程</h3>
-<h4 id="最小二乘法矩阵表示">2.1、最小二乘法矩阵表示</h4>
+<p><a href="c.png" title="c" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//c.png" alt="c"></a></p>
+<h4 id="1-5、多元线性回归">1.5、多元线性回归</h4>
+<p>现实生活中，往往影响结果 y 的因素不止一个，这时 x 就从一个变成了 n 个，$x_1$…$x_n$ 同时简单线性回归的公式也就不在适用了。<strong>多元线性回归</strong>公式如下：</p>
+<p>$\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n + b$</p>
+<p>b是截距，也可以使用$w_0$来表示</p>
+<p>$\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n + w_0$</p>
+<p>$\hat{y} = w_1x_1 + w_2x_2 + …… + w_nx_n + w_0 * 1$</p>
+<p>使用向量来表示，$\vec{X}$表示所有的变量，是一维向量；$\vec{W}$表示所有的系数（包含$w_0$），是一维向量，根据向量乘法规律，可以这么写：</p>
+<p>$\hat{y} = W^TX$【默认情况下，向量都是列向量】</p>
+<p><a href="d.png" title="d" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//d.png" alt="d"></a></p>
+<h3 id="2、正规方程">2、正规方程</h3>
+<h4 id="2-1、最小二乘法矩阵表示">2.1、最小二乘法矩阵表示</h4>
 <p><strong>最小二乘法</strong>可以将误差方程转化为有确定解的<strong>代数方程组</strong>（其方程式数目正好等于未知数的个数），从而可求解出这些未知参数。这个有确定解的代数方程组称为最小二乘法估计的<strong>正规方程</strong>。公式如下：</p>
-<p><span class="math inline">\(\theta = (X^TX)^{-1}X^Ty\)</span> 或者
-<span class="math inline">\(W = (X^TX)^{-1}X^Ty\)</span> ，其中的<span class="math inline">\(W、\theta\)</span> 即使方程的解！</p>
-<figure>
-<a href="e.png" title="e" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//e.png" alt="e"></a>
-<figcaption aria-hidden="true">e</figcaption>
-</figure>
+<p>$\theta = (X^TX)^{-1}X^Ty$ 或者 $W = (X^TX)^{-1}X^Ty$ ，其中的$W、\theta$ 即使方程的解！</p>
+<p><a href="e.png" title="e" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//e.png" alt="e"></a></p>
 <p>公式是如何<strong>推导</strong>的？</p>
 <p>最小二乘法公式如下：</p>
-<p><span class="math inline">\(J(\theta) = \frac{1}{2}\sum\limits_{i =
-0}^n(h_{\theta}(x_i) - y_i)^2\)</span></p>
+<p>$J(\theta) = \frac{1}{2}\sum\limits_{i = 0}^n(h_{\theta}(x_i) - y_i)^2$</p>
 <p>使用矩阵表示：</p>
-<figure>
-<a href="f.png" title="f" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//f.png" alt="f"></a>
-<figcaption aria-hidden="true">f</figcaption>
-</figure>
+<p><a href="f.png" title="f" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//f.png" alt="f"></a></p>
 <p>之所以要使用转置T，是因为，矩阵运算规律是：矩阵A的一行乘以矩阵B的一列！</p>
-<figure>
-<a href="g.png" title="g" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//g.png" alt="g"></a>
-<figcaption aria-hidden="true">g</figcaption>
-</figure>
-<h4 id="多元一次方程举例">2.2、多元一次方程举例</h4>
+<p><a href="g.png" title="g" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//g.png" alt="g"></a></p>
+<h4 id="2-2、多元一次方程举例">2.2、多元一次方程举例</h4>
 <p>1、二元一次方程</p>
-<figure>
-<a href="h.png" title="h" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//h.png" alt="h"></a>
-<figcaption aria-hidden="true">h</figcaption>
-</figure>
+<p><a href="h.png" title="h" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//h.png" alt="h"></a></p>
 <p>2、三元一次方程</p>
-<figure>
-<a href="i.png" title="i" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//i.png" alt="i"></a>
-<figcaption aria-hidden="true">i</figcaption>
-</figure>
+<p><a href="i.png" title="i" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//i.png" alt="i"></a></p>
 <p>3、八元一次方程</p>
-<figure>
-<a href="j.png" title="j" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//j.png" alt="j"></a>
-<figcaption aria-hidden="true">j</figcaption>
-</figure>
+<p><a href="j.png" title="j" class="gallery-item" style="box-shadow: none;"> <img src="/2023/08/17/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92//j.png" alt="j"></a></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 上面八元一次方程对应的X数据</span></span><br><span class="line">X = np.array([[  <span class="number">0</span> ,<span class="number">14</span> , <span class="number">8</span> ,  <span class="number">0</span> ,  <span class="number">5</span>,  -<span class="number">2</span>,   <span class="number">9</span>,  -<span class="number">3</span>],</span><br><span class="line"> [ -<span class="number">4</span> , <span class="number">10</span> ,  <span class="number">6</span> ,  <span class="number">4</span> ,-<span class="number">14</span> , -<span class="number">2</span> ,-<span class="number">14</span>  , <span class="number">8</span>],</span><br><span class="line"> [ -<span class="number">1</span> , -<span class="number">6</span>  , <span class="number">5</span> ,-<span class="number">12</span> ,  <span class="number">3</span> , -<span class="number">3</span> ,  <span class="number">2</span> , -<span class="number">2</span>],</span><br><span class="line"> [  <span class="number">5</span> , -<span class="number">2</span>  , <span class="number">3</span> , <span class="number">10</span>  , <span class="number">5</span> , <span class="number">11</span> ,  <span class="number">4</span>  ,-<span class="number">8</span>],</span><br><span class="line"> [-<span class="number">15</span> ,-<span class="number">15</span>  ,-<span class="number">8</span> ,-<span class="number">15</span> ,  <span class="number">7</span> , -<span class="number">4</span>, -<span class="number">12</span> ,  <span class="number">2</span>],</span><br><span class="line"> [ <span class="number">11</span> ,-<span class="number">10</span> , -<span class="number">2</span> ,  <span class="number">4</span>  , <span class="number">3</span> , -<span class="number">9</span> , -<span class="number">6</span> ,  <span class="number">7</span>],</span><br><span class="line"> [-<span class="number">14</span> ,  <span class="number">0</span> ,  <span class="number">4</span> , -<span class="number">3</span>  , <span class="number">5</span> , <span class="number">10</span> , <span class="number">13</span> ,  <span class="number">7</span>],</span><br><span class="line"> [ -<span class="number">3</span> , -<span class="number">7</span> , -<span class="number">2</span> , -<span class="number">8</span>  , <span class="number">0</span> , -<span class="number">6</span> , -<span class="number">5</span> , -<span class="number">9</span>]])</span><br><span class="line"><span class="comment"># 对应的y</span></span><br><span class="line">y = np.array([ <span class="number">339</span> ,-<span class="number">114</span>  , <span class="number">30</span> , <span class="number">126</span>, -<span class="number">395</span> , -<span class="number">87</span> , <span class="number">422</span>, -<span class="number">309</span>])</span><br><span class="line">display(X,y)</span><br></pre></td></tr></table></figure>
-<h4 id="矩阵转置公式与求导公式">2.3、矩阵转置公式与求导公式：</h4>
+<h4 id="2-3、矩阵转置公式与求导公式：">2.3、矩阵转置公式与求导公式：</h4>
 <p><strong>转置公式如下：</strong></p>
 <ul>
-<li><span class="math inline">\((mA)^T = mA^T\)</span>，其中m是常数</li>
-<li><span class="math inline">\((A + B)^T = A^T + B^T\)</span></li>
-<li><span class="math inline">\((AB)^T = B^TA^T\)</span></li>
-<li><span class="math inline">\((A^T)^T = A\)</span></li>
+<li>$(mA)^T = mA^T$，其中m是常数</li>
+<li>$(A + B)^T = A^T + B^T$</li>
+<li>$(AB)^T = B^TA^T$</li>
+<li>$(A^T)^T = A$</li>
 </ul>
 <p><strong>求导公式如下：</strong></p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f8edeac442294ed5a1ab4a03f0de6cfe.png" alt="f8edeac442294ed5a1ab4a03f0de6cfe">
-<figcaption aria-hidden="true">f8edeac442294ed5a1ab4a03f0de6cfe</figcaption>
-</figure>
-<h4 id="推导正规方程-theta-的解">2.4、推导正规方程 <span class="math inline">\(\theta\)</span> 的解：</h4>
-<ol type="1">
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f8edeac442294ed5a1ab4a03f0de6cfe.png" title="f8edeac442294ed5a1ab4a03f0de6cfe" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f8edeac442294ed5a1ab4a03f0de6cfe.png" alt="f8edeac442294ed5a1ab4a03f0de6cfe"></a></p>
+<h4 id="2-4、推导正规方程-theta-的解：">2.4、推导正规方程 $\theta$ 的解：</h4>
+<ol>
 <li><strong>矩阵乘法公式展开</strong></li>
 </ol>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/77b1210b3bfa43cca35b0e3a79565c83.png" alt="77b1210b3bfa43cca35b0e3a79565c83">
-<figcaption aria-hidden="true">77b1210b3bfa43cca35b0e3a79565c83</figcaption>
-</figure>
-<ol start="2" type="1">
-<li><strong>进行求导（注意X、y是已知量，<span class="math inline">\(\theta\)</span> 是未知数）：</strong></li>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/77b1210b3bfa43cca35b0e3a79565c83.png" title="77b1210b3bfa43cca35b0e3a79565c83" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/77b1210b3bfa43cca35b0e3a79565c83.png" alt="77b1210b3bfa43cca35b0e3a79565c83"></a></p>
+<ol start="2">
+<li><strong>进行求导（注意X、y是已知量，$\theta$ 是未知数）：</strong></li>
 </ol>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/7a36e5110d1246a9b535921c2c943b16.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/7a36e5110d1246a9b535921c2c943b16.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/7a36e5110d1246a9b535921c2c943b16.png" alt="image.png"></a></p>
 <p>根据<strong>2.3、矩阵转置公式与求导公式</strong>可知</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c58118e586de408aa3ab7f5e28566a24.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<ol start="3" type="1">
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c58118e586de408aa3ab7f5e28566a24.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c58118e586de408aa3ab7f5e28566a24.png" alt="image.png"></a></p>
+<ol start="3">
 <li><strong>根据上面求导公式进行运算：</strong></li>
 </ol>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/81180de05e0e44fab748f77ec5b45365.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<ol start="4" type="1">
-<li><strong>令导数<span class="math inline">\(J&#39;(\theta) =
-0：\)</span></strong></li>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/81180de05e0e44fab748f77ec5b45365.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/81180de05e0e44fab748f77ec5b45365.png" alt="image.png"></a></p>
+<ol start="4">
+<li><strong>令导数$J’(\theta) = 0：$</strong></li>
 </ol>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/3934cd63cbf1444fb836cf3d5e70fe64.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<ol start="5" type="1">
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/3934cd63cbf1444fb836cf3d5e70fe64.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/3934cd63cbf1444fb836cf3d5e70fe64.png" alt="image.png"></a></p>
+<ol start="5">
 <li><strong>矩阵没有除法，使用逆矩阵进行转化：</strong></li>
 </ol>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/56641d424c9945a2a8452708cd8e27b3.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/56641d424c9945a2a8452708cd8e27b3.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/56641d424c9945a2a8452708cd8e27b3.png" alt="image.png"></a></p>
 <p>到此为止，公式推导出来了~</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/98a7d8c20ba14fa1867937e75d1e29b7.gif" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h4 id="凸函数判定">2.5、凸函数判定</h4>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/98a7d8c20ba14fa1867937e75d1e29b7.gif" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/98a7d8c20ba14fa1867937e75d1e29b7.gif" alt="image.png"></a></p>
+<h4 id="2-5、凸函数判定">2.5、凸函数判定</h4>
 <p>判定损失函数是凸函数的好处在于我们可能很肯定的知道我们求得的极值即最优解，一定是全局最优解。</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/fb6a9e9787304b58b096720379e9421f.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/fb6a9e9787304b58b096720379e9421f.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/fb6a9e9787304b58b096720379e9421f.png" alt="image.png"></a></p>
 <p>如果是非凸函数，那就不一定可以获取全局最优解~</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f60f1e2ea73148719cf19a255044a975.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f60f1e2ea73148719cf19a255044a975.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f60f1e2ea73148719cf19a255044a975.png" alt="image.png"></a></p>
 <p>来一个更加立体的效果图：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9822098f45bf4b4fa37eb859d361cce6.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>判定凸函数的方式:
-判定凸函数的方式非常多，其中一个方法是看<strong>黑塞矩阵</strong>是否是<strong>半正定</strong>的。</p>
-<p>黑塞矩阵(hessian matrix)是由目标函数在点 X
-处的二阶偏导数组成的对称矩阵。</p>
-<p>对于我们的式子来说就是在导函数的基础上再次对θ来求偏导，结果就是 <span class="math inline">\(X^TX\)</span>。所谓正定就是 <span class="math inline">\(X^TX\)</span> 的特征值全为正数，半正定就是 <span class="math inline">\(X^TX\)</span> 的特征值大于等于 0，
-就是半正定。</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/eda2806b9e5246e4bae439711efa5f55.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>这里我们对 <span class="math inline">\(J(\theta)\)</span>
-损失函数求二阶导数的黑塞矩阵是 <span class="math inline">\(X^TX\)</span>
-，得到的一定是半正定的，自己和自己做点乘嘛！</p>
-<p>这里不用数学推导证明这一点。在机器学习中往往损失函数都是<strong>凸函数</strong>，到<strong>深度学习</strong>中损失函数往往是<strong>非凸函数</strong>，即找到的解<strong>未必</strong>是全局最优，只要模型堪用就好！机器学习特点是：不强调模型
-100% 正确，只要是有价值的，堪用的，就Okay！</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b8d27b44461d447b8a0a4fda0f87f22f.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h3 id="线性回归算法推导">3、线性回归算法推导</h3>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9822098f45bf4b4fa37eb859d361cce6.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9822098f45bf4b4fa37eb859d361cce6.png" alt="image.png"></a></p>
+<p>判定凸函数的方式: 判定凸函数的方式非常多，其中一个方法是看<strong>黑塞矩阵</strong>是否是<strong>半正定</strong>的。</p>
+<p>黑塞矩阵(hessian matrix)是由目标函数在点 X 处的二阶偏导数组成的对称矩阵。</p>
+<p>对于我们的式子来说就是在导函数的基础上再次对θ来求偏导，结果就是 $X^TX$。所谓正定就是 $X^TX$ 的特征值全为正数，半正定就是 $X^TX$ 的特征值大于等于 0， 就是半正定。</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/eda2806b9e5246e4bae439711efa5f55.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/eda2806b9e5246e4bae439711efa5f55.png" alt="image.png"></a></p>
+<p>这里我们对 $J(\theta)$ 损失函数求二阶导数的黑塞矩阵是 $X^TX$ ，得到的一定是半正定的，自己和自己做点乘嘛！</p>
+<p>这里不用数学推导证明这一点。在机器学习中往往损失函数都是<strong>凸函数</strong>，到<strong>深度学习</strong>中损失函数往往是<strong>非凸函数</strong>，即找到的解<strong>未必</strong>是全局最优，只要模型堪用就好！机器学习特点是：不强调模型 100% 正确，只要是有价值的，堪用的，就Okay！</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b8d27b44461d447b8a0a4fda0f87f22f.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b8d27b44461d447b8a0a4fda0f87f22f.jpeg" alt="image.png"></a></p>
+<h3 id="3、线性回归算法推导">3、线性回归算法推导</h3>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Soft_Po/article/details/118731058">最小二乘推导</a></p>
-<h4 id="深入理解回归">3.1、深入理解回归</h4>
-<p><strong>回归</strong>简单来说就是“回归平均值”(regression to the
-mean)。但是这里的 mean 并不是把
-历史数据直接当成未来的预测值，而是会把期望值当作预测值。
-追根溯源<strong>回归</strong>这个词是一个叫高尔顿的人发明的，他通过大量观察数据发现:父亲比较高，儿子也比较高；父亲比较矮，那么儿子也比较矮！正所谓“龙生龙凤生凤老鼠的儿子会打洞”！但是会存在一定偏差~</p>
-<p>父亲是 1.98，儿子肯定很高，但有可能不会达到1.98 父亲是
-1.69，儿子肯定不高，但是有可能比 1.69 高</p>
+<h4 id="3-1、深入理解回归">3.1、深入理解回归</h4>
+<p><strong>回归</strong>简单来说就是“回归平均值”(regression to the mean)。但是这里的 mean 并不是把 历史数据直接当成未来的预测值，而是会把期望值当作预测值。 追根溯源<strong>回归</strong>这个词是一个叫高尔顿的人发明的，他通过大量观察数据发现:父亲比较高，儿子也比较高；父亲比较矮，那么儿子也比较矮！正所谓“龙生龙凤生凤老鼠的儿子会打洞”！但是会存在一定偏差~</p>
+<p>父亲是 1.98，儿子肯定很高，但有可能不会达到1.98<br>
+父亲是 1.69，儿子肯定不高，但是有可能比 1.69 高</p>
 <p>大自然让我们<strong>回归</strong>到一定的区间之内，这就是<strong>大自然神奇</strong>的力量。</p>
 <p>高尔顿是谁？<strong>达尔文</strong>的表弟，这下可以相信他说的十有八九是<strong>对的</strong>了吧！</p>
 <p>人类社会很多事情都被大自然这种神奇的力量只配置：身高、体重、智商、相貌……</p>
 <p>这种神秘的力量就叫<strong>正态分布</strong>。大数学家高斯，深入研究了正态分布，最终推导出了线性回归的原理：<strong>最小二乘法</strong>！</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b187c8d76451404fb86d799444d0e950.jpg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b187c8d76451404fb86d799444d0e950.jpg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b187c8d76451404fb86d799444d0e950.jpg" alt="image.png"></a></p>
 <p>接下来，我们跟着高斯的足迹继续向下走~</p>
-<h4 id="误差分析">3.2、误差分析</h4>
-<p>误差 <span class="math inline">\(\varepsilon_i\)</span> 等于第 i
-个样本实际的值 <span class="math inline">\(y_i\)</span> 减去预测的值
-<span class="math inline">\(\hat{y}\)</span> ，公式可以表达为如下：</p>
-<p><span class="math inline">\(\varepsilon_i = |y_i -
-\hat{y}|\)</span></p>
-<p><span class="math inline">\(\varepsilon_i = |y_i -
-W^Tx_i|\)</span></p>
-<p>假定所有的样本的误差都是<strong>独立的</strong>，有上下的震荡，震荡认为是随机变量，足够多的随机变量叠加之后形成的分布，它服从的就是正态分布，因为它是正常状态下的分布，也就是高斯分布！<strong>均值</strong>是某一个值，<strong>方差</strong>是某一个值。
-方差我们先不管，均值我们总有办法让它去等于零 0
-的，因为我们这里是有截距b，
-所有误差我们就可以认为是独立分布的，1&lt;=i&lt;=n，服从均值为
-0，方差为某定值的<strong>高斯分布</strong>。机器学习中我们<strong>假设</strong>误差符合均值为0，方差为定值的正态分布！！！</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/17e2809b4c85410e948cffe3643ad34d.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h4 id="最大似然估计">3.3、最大似然估计</h4>
-<p>最大似然估计(maximum likelihood estimation,
-MLE)一种重要而普遍的求估计量的方法。<strong>最大似然估计</strong>明确地使用概率模型，其目标是寻找能够以较高概率产生观察数据的系统发生树。最大似然估计是一类完全基于<strong>统计</strong>的系统发生树重建方法的代表。</p>
+<h4 id="3-2、误差分析">3.2、误差分析</h4>
+<p>误差 $\varepsilon_i$ 等于第 i 个样本实际的值 $y_i$ 减去预测的值 $\hat{y}$ ，公式可以表达为如下：</p>
+<p>$\varepsilon_i = |y_i - \hat{y}|$</p>
+<p>$\varepsilon_i = |y_i - W^Tx_i|$</p>
+<p>假定所有的样本的误差都是<strong>独立的</strong>，有上下的震荡，震荡认为是随机变量，足够多的随机变量叠加之后形成的分布，它服从的就是正态分布，因为它是正常状态下的分布，也就是高斯分布！<strong>均值</strong>是某一个值，<strong>方差</strong>是某一个值。 方差我们先不管，均值我们总有办法让它去等于零 0 的，因为我们这里是有截距b， 所有误差我们就可以认为是独立分布的，1&lt;=i&lt;=n，服从均值为 0，方差为某定值的<strong>高斯分布</strong>。机器学习中我们<strong>假设</strong>误差符合均值为0，方差为定值的正态分布！！！</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/17e2809b4c85410e948cffe3643ad34d.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/17e2809b4c85410e948cffe3643ad34d.jpeg" alt="image.png"></a></p>
+<h4 id="3-3、最大似然估计">3.3、最大似然估计</h4>
+<p>最大似然估计(maximum likelihood estimation, MLE)一种重要而普遍的求估计量的方法。<strong>最大似然估计</strong>明确地使用概率模型，其目标是寻找能够以较高概率产生观察数据的系统发生树。最大似然估计是一类完全基于<strong>统计</strong>的系统发生树重建方法的代表。</p>
 <p>是不是，有点看不懂，<strong>太学术</strong>了，我们举例说明~</p>
 <p>假如有一个罐子，里面有<strong>黑白</strong>两种颜色的球，数目多少不知，两种颜色的<strong>比例</strong>也不知。我们想知道罐中白球和黑球的比例，但我们<strong>不能</strong>把罐中的球全部拿出来数。现在我们可以每次任意从已经<strong>摇匀</strong>的罐中拿一个球出来，<strong>记录</strong>球的颜色，然后把拿出来的球再<strong>放回</strong>罐中。这个过程可以<strong>重复</strong>，我们可以用记录的球的颜色来估计罐中黑白球的比例。假如在前面的一百次重复记录中，有七十次是白球，请问罐中白球所占的比例<strong>最有可能</strong>是多少？</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5c0148f54cc344b6baec29a716498990.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5c0148f54cc344b6baec29a716498990.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5c0148f54cc344b6baec29a716498990.jpeg" alt="image.png"></a></p>
 <p>请告诉我答案！</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b5c23fbbefd84607abd1c614c68313e1.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b5c23fbbefd84607abd1c614c68313e1.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b5c23fbbefd84607abd1c614c68313e1.jpeg" alt="image.png"></a></p>
 <p>很多小伙伴，甚至不用算，凭感觉，就能给出答案：<strong>70%</strong>！</p>
 <p><strong>下面是详细推导过程：</strong></p>
 <ul>
-<li><p>最大似然估计，计算</p></li>
-<li><p>白球概率是p，黑球是1-p（罐子中非黑即白）</p></li>
-<li><p>罐子中取一个请问是白球的概率是多少？</p>
-<p><span class="math display">\[
-p
-\]</span></p></li>
-<li><p>罐子中取两个球，两个球都是白色，概率是多少？</p>
-<p><span class="math display">\[
-p^2
-\]</span></p></li>
-<li><p>罐子中取5个球都是白色，概率是多少？</p>
-<p><span class="math display">\[
-p^5
-\]</span></p></li>
-<li><p>罐子中取10个球，9个是白色，一个是黑色，概率是多少呢？</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/71a9684cd4564aef96591431bbaa1a27.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<li>
+<p>最大似然估计，计算</p>
+</li>
+<li>
+<p>白球概率是p，黑球是1-p（罐子中非黑即白）</p>
+</li>
+<li>
+<p>罐子中取一个请问是白球的概率是多少？</p>
+<p>$$<br>
+p<br>
+$$</p>
+</li>
+<li>
+<p>罐子中取两个球，两个球都是白色，概率是多少？</p>
+<p>$$<br>
+p^2<br>
+$$</p>
+</li>
+<li>
+<p>罐子中取5个球都是白色，概率是多少？</p>
+<p>$$<br>
+p^5<br>
+$$</p>
+</li>
+<li>
+<p>罐子中取10个球，9个是白色，一个是黑色，概率是多少呢？</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/71a9684cd4564aef96591431bbaa1a27.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/71a9684cd4564aef96591431bbaa1a27.jpeg" alt="image.png"></a></p>
 <ul>
-<li><span class="math inline">\(C_{10}^1 = C_{10}^1\)</span>
-这个两个排列组合公式是<strong>相等的</strong>~</li>
-<li><span class="math display">\[
-C_{10}^9p^9(1-p) = C_{10}^1p^9(1-p)
-\]</span></li>
-</ul></li>
-<li><p>罐子取100个球，70次是白球，30次是黑球，概率是多少？</p></li>
-<li><p><span class="math display">\[
-P = C_{100}^{30}p^{70}(1-p)^{30}
-\]</span></p></li>
-<li><p>最大似然估计，什么时候P最大呢？</p>
-<p><span class="math inline">\(C_{100}^{30}\)</span>是常量，可以<strong>去掉</strong>！</p>
-<p>p &gt; 0，1- p &gt;
-0，所以上面概率想要求最大值，那么求<strong>导数</strong>即可！</p></li>
-<li><p><span class="math display">\[
-P&#39; = 70*p^{69}*(1-p)^{30} + p^{70}*30*(1-p)^{29}*(-1)
-\]</span></p>
-<p><strong>令导数为0：</strong></p></li>
-<li><p><span class="math display">\[
-0 = 70*p^{69}*(1-p)^{30} +p^{70}*30*(1-p)^{29}*(-1)
-\]</span></p>
-<p><strong>公式化简：</strong></p></li>
-<li><p><span class="math display">\[
-0 = 70*(1-p) - p*30
-\]</span></p></li>
-<li><p><span class="math display">\[
-0 = 70 - 100*p
-\]</span></p></li>
-<li><p><strong>p = 70%</strong></p></li>
+<li>$C_{10}^1 = C_{10}^1$ 这个两个排列组合公式是<strong>相等的</strong>~</li>
+<li>$$<br>
+C_{10}^9p^9(1-p) = C_{10}^1p^9(1-p)<br>
+$$</li>
 </ul>
-<h4 id="高斯分布-概率密度函数">3.4、高斯分布-概率密度函数</h4>
+</li>
+<li>
+<p>罐子取100个球，70次是白球，30次是黑球，概率是多少？</p>
+</li>
+<li>
+<p>$$<br>
+P = C_{100}^{30}p^{70}(1-p)^{30}<br>
+$$</p>
+</li>
+<li>
+<p>最大似然估计，什么时候P最大呢？</p>
+<p>$C_{100}^{30}$是常量，可以<strong>去掉</strong>！</p>
+<p>p &gt; 0，1- p &gt; 0，所以上面概率想要求最大值，那么求<strong>导数</strong>即可！</p>
+</li>
+<li>
+<p>$$<br>
+P’ = 70<em>p^{69}</em>(1-p)^{30} + p^{70}<em>30</em>(1-p)^{29}*(-1)<br>
+$$</p>
+<p><strong>令导数为0：</strong></p>
+</li>
+<li>
+<p>$$<br>
+0 = 70<em>p^{69}</em>(1-p)^{30} +p^{70}<em>30</em>(1-p)^{29}*(-1)<br>
+$$</p>
+<p><strong>公式化简：</strong></p>
+</li>
+<li>
+<p>$$<br>
+0 = 70*(1-p) - p*30<br>
+$$</p>
+</li>
+<li>
+<p>$$<br>
+0 = 70 - 100*p<br>
+$$</p>
+</li>
+<li>
+<p><strong>p = 70%</strong></p>
+</li>
+</ul>
+<h4 id="3-4、高斯分布-概率密度函数">3.4、高斯分布-概率密度函数</h4>
 <p>最常见的连续概率分布是<strong>正态分布</strong>，也叫<strong>高斯分布</strong>，而这正是我们所需要的，其概率密度函数如下:</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f6bddf6943174fc88718cdad4cc3ce7e.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f6bddf6943174fc88718cdad4cc3ce7e.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f6bddf6943174fc88718cdad4cc3ce7e.jpeg" alt="image.png"></a></p>
 <p>公式如下：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/4b353b48bba34cf9820ddcad0ef9548b.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>随着参数μ和σ<strong>变化</strong>，概率分布也产生变化。
-下面重要的步骤来了，我们要把一组数据误差出现的<strong>总似然</strong>，也就是一组数据之所以对应误差出现的<strong>整体可能性</strong>表达出来了，因为数据的误差我们假设服从一个高斯分布，并且通过<strong>截距</strong>项来平移整体分布的位置从而使得<strong>μ=0</strong>，所以样本的误差我们可以表达其概率密度函数的值如下:</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c1e8d58d707c4d65ba03cc873204f8d3.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/4b353b48bba34cf9820ddcad0ef9548b.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/4b353b48bba34cf9820ddcad0ef9548b.png" alt="image.png"></a></p>
+<p>随着参数μ和σ<strong>变化</strong>，概率分布也产生变化。 下面重要的步骤来了，我们要把一组数据误差出现的<strong>总似然</strong>，也就是一组数据之所以对应误差出现的<strong>整体可能性</strong>表达出来了，因为数据的误差我们假设服从一个高斯分布，并且通过<strong>截距</strong>项来平移整体分布的位置从而使得<strong>μ=0</strong>，所以样本的误差我们可以表达其概率密度函数的值如下:</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c1e8d58d707c4d65ba03cc873204f8d3.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/c1e8d58d707c4d65ba03cc873204f8d3.png" alt="image.png"></a></p>
 <p><strong>简化</strong>如下：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/8270a090b4fa4cbeb6cdc7214211c213.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h4 id="误差总似然">3.5、误差总似然</h4>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/8270a090b4fa4cbeb6cdc7214211c213.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/8270a090b4fa4cbeb6cdc7214211c213.png" alt="image.png"></a></p>
+<h4 id="3-5、误差总似然">3.5、误差总似然</h4>
 <p>和前面黑球白球问题<strong>类似</strong>，也是一个<strong>累乘</strong>问题~</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/d9636ac44e0f48fdac68b382c4f219c0.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>根据前面公式<span class="math inline">\(\varepsilon_i = |y_i -
-W^Tx_i|\)</span>可以推导出来如下公式：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f1b113438f234395b9524456a89c7006.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>公式中的<strong>未知变量</strong>就是<span class="math inline">\(W^T\)</span>，即方程的系数，系数包含截距~如果，把上面当成一个方程，就是概率P关于W的方程！其余符号，都是常量！</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/1a4d510c461b478bac25f6abdbc68e5e.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/d9636ac44e0f48fdac68b382c4f219c0.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/d9636ac44e0f48fdac68b382c4f219c0.png" alt="image.png"></a></p>
+<p>根据前面公式$\varepsilon_i = |y_i - W^Tx_i|$可以推导出来如下公式：</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f1b113438f234395b9524456a89c7006.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f1b113438f234395b9524456a89c7006.png" alt="image.png"></a></p>
+<p>公式中的<strong>未知变量</strong>就是$W^T$，即方程的系数，系数包含截距~如果，把上面当成一个方程，就是概率P关于W的方程！其余符号，都是常量！</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/1a4d510c461b478bac25f6abdbc68e5e.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/1a4d510c461b478bac25f6abdbc68e5e.png" alt="image.png"></a></p>
 <p>现在问题，就变换成了，求<strong>最大似然</strong>问题了！不过，等等~</p>
 <p>累乘的最大似然，求解是非常麻烦的！</p>
 <p>接下来，我们通过，求<strong>对数</strong>把<strong>累乘</strong>问题，转变为<strong>累加</strong>问题（加法问题，无论多复杂，都难不倒我了！）</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/a9518e4542fa44668535a7e33809239c.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h4 id="最小二乘法mse">3.6、最小二乘法MSE</h4>
-<p><span class="math inline">\(P_W = \prod\limits_{i =
-0}^{n}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y_i -
-W^Tx_i)^2}{2\sigma^2}}\)</span></p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/a9518e4542fa44668535a7e33809239c.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/a9518e4542fa44668535a7e33809239c.jpeg" alt="image.png"></a></p>
+<h4 id="3-6、最小二乘法MSE">3.6、最小二乘法MSE</h4>
+<p>$P_W = \prod\limits_{i = 0}^{n}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y_i - W^Tx_i)^2}{2\sigma^2}}$</p>
 <p>根据对数，单调性，对上面公式求自然底数e的对数，效果不变~</p>
-<p><span class="math inline">\(log_e(P_W) = log_e(\prod\limits_{i =
-0}^{n}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y_i -
-W^Tx_i)^2}{2\sigma^2}})\)</span></p>
-<p>接下来 log
-函数继续为你带来惊喜，数学上连乘是个大麻烦，即使交给计算机去求解它也得<strong>哭出声来</strong>。惊喜是:</p>
+<p>$log_e(P_W) = log_e(\prod\limits_{i = 0}^{n}\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(y_i - W^Tx_i)^2}{2\sigma^2}})$</p>
+<p>接下来 log 函数继续为你带来惊喜，数学上连乘是个大麻烦，即使交给计算机去求解它也得<strong>哭出声来</strong>。惊喜是:</p>
 <ul>
-<li><span class="math inline">\(log_a(XY) = log_aX +
-log_aY\)</span></li>
-<li><span class="math inline">\(log_a\frac{X}{Y} = log_aX -
-log_aY\)</span></li>
-<li><span class="math inline">\(log_aX^n = n*log_aX\)</span></li>
-<li><span class="math inline">\(log_a(X_1X_2……X_n) = log_aX_1 + log_aX_2
-+ …… + log_aX_n\)</span></li>
-<li><span class="math inline">\(log_xx^n = n(n\in R)\)</span></li>
-<li><span class="math inline">\(log_a\frac{1}{X} = -log_aX\)</span></li>
-<li><span class="math inline">\(log_a\sqrt[x]{N^y} =
-\frac{y}{x}log_aN\)</span></li>
+<li>$log_a(XY) = log_aX + log_aY$</li>
+<li>$log_a\frac{X}{Y} = log_aX - log_aY$</li>
+<li>$log_aX^n = n*log_aX$</li>
+<li>$log_a(X_1X_2……X_n) = log_aX_1 + log_aX_2 + …… + log_aX_n$</li>
+<li>$log_xx^n = n(n\in R)$</li>
+<li>$log_a\frac{1}{X} = -log_aX$</li>
+<li>$log_a\sqrt[x]{N^y} = \frac{y}{x}log_aN$</li>
 </ul>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5a0de92b4e974103b61936748a72bd88.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p><strong>乘风破浪，继续推导---&gt;</strong></p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/10425befead44d74a162d56db3586232.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>上面公式是最大似然求对数后的变形，其中<span class="math inline">\(\pi、\sigma\)</span>都是常量，而<span class="math inline">\((y_i -
-W^Tx_i)^2\)</span>肯定大于<strong>零</strong>！上面求最大值问题，即可转变为如下求<strong>最小值</strong>问题：</p>
-<p><span class="math inline">\(L(W) = \frac{1}{2}\sum\limits_{i =
-0}^n(y^{(i)} - W^Tx^{(i)})^2\)</span>
-L代表Loss，表示损失函数，损失函数<strong>越小</strong>，那么上面最大似然就<strong>越大</strong>~</p>
-<p>有的书本上公式，也可以这样写，用<span class="math inline">\(J(\theta)\)</span>表示一个意思，<span class="math inline">\(\theta\)</span> 的角色就是W：</p>
-<p><span class="math inline">\(J(\theta) = \frac{1}{2}\sum\limits_{i =
-1}^n(y^{(i)} - \theta^Tx^{(i)})^2 = \frac{1}{2}\sum\limits_{i =
-1}^n(\theta^Tx^{(i)} - y^{(i)})^2\)</span></p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5a0de92b4e974103b61936748a72bd88.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/5a0de92b4e974103b61936748a72bd88.png" alt="image.png"></a></p>
+<p><strong>乘风破浪，继续推导—&gt;</strong></p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/10425befead44d74a162d56db3586232.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/10425befead44d74a162d56db3586232.png" alt="image.png"></a></p>
+<p>上面公式是最大似然求对数后的变形，其中$\pi、\sigma$都是常量，而$(y_i - W^Tx_i)^2$肯定大于<strong>零</strong>！上面求最大值问题，即可转变为如下求<strong>最小值</strong>问题：</p>
+<p>$L(W) = \frac{1}{2}\sum\limits_{i = 0}^n(y^{(i)} - W^Tx^{(i)})^2$   L代表Loss，表示损失函数，损失函数<strong>越小</strong>，那么上面最大似然就<strong>越大</strong>~</p>
+<p>有的书本上公式，也可以这样写，用$J(\theta)$表示一个意思，$\theta$ 的角色就是W：</p>
+<p>$J(\theta) = \frac{1}{2}\sum\limits_{i = 1}^n(y^{(i)} - \theta^Tx^{(i)})^2 = \frac{1}{2}\sum\limits_{i = 1}^n(\theta^Tx^{(i)} - y^{(i)})^2$</p>
 <p><strong>进一步提取：</strong></p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9cd20d0c4c8548e0be72f2e5899f24cc.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9cd20d0c4c8548e0be72f2e5899f24cc.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/9cd20d0c4c8548e0be72f2e5899f24cc.png" alt="image.png"></a></p>
 <p>其中：</p>
-<p><span class="math inline">\(\hat{y} = h_{\theta}(X) =X
-\theta\)</span>
-表示全部数据，是矩阵，X表示多个数据，进行矩阵乘法时，放在前面</p>
-<p><span class="math inline">\(\hat{y}_i = h_{\theta}(x^{(i)}) =
-\theta^Tx^{(i)}\)</span>
-表示第i个数据，是向量，所以进行乘法时，其中一方需要转置</p>
-<p>因为最大似然公式中有个<strong>负号</strong>，所以最大总似然变成了<strong>最小化</strong>负号后面的部分。
-到这里，我们就已经推导出来了 MSE 损失函数<span class="math inline">\(J(\theta)\)</span>，从公式我们也可以看出来 MSE
-名字的来 历，mean squared error，上式也叫做最小二乘法！</p>
-<h4 id="归纳总结升华">3.7、归纳总结升华</h4>
-<p>这种最小二乘法估计，其实我们就可以认为，假定了误差服从正太分布，认为样本误差的出现是随机的，独立的，使用最大似然估计思想，利用损失函数最小化
-MSE
-就能求出最优解！所以反过来说，如果我们的数据误差不是互相独立的，或者不是随机出现的，那么就不适合去假设为正太分布，就不能去用正太分布的概率密度函数带入到总似然的函数中，故而就不能用
-MSE 作为损失函数去求解最优解了！所以，最小二乘法不是万能的~</p>
+<p>$\hat{y} = h_{\theta}(X) =X \theta$ 表示全部数据，是矩阵，X表示多个数据，进行矩阵乘法时，放在前面</p>
+<p>$\hat{y}<em>i = h</em>{\theta}(x^{(i)}) = \theta^Tx^{(i)}$ 表示第i个数据，是向量，所以进行乘法时，其中一方需要转置</p>
+<p>因为最大似然公式中有个<strong>负号</strong>，所以最大总似然变成了<strong>最小化</strong>负号后面的部分。 到这里，我们就已经推导出来了 MSE 损失函数$J(\theta)$，从公式我们也可以看出来 MSE 名字的来 历，mean squared error，上式也叫做最小二乘法！</p>
+<h4 id="3-7、归纳总结升华">3.7、归纳总结升华</h4>
+<p>这种最小二乘法估计，其实我们就可以认为，假定了误差服从正太分布，认为样本误差的出现是随机的，独立的，使用最大似然估计思想，利用损失函数最小化 MSE 就能求出最优解！所以反过来说，如果我们的数据误差不是互相独立的，或者不是随机出现的，那么就不适合去假设为正太分布，就不能去用正太分布的概率密度函数带入到总似然的函数中，故而就不能用 MSE 作为损失函数去求解最优解了！所以，最小二乘法不是万能的~</p>
 <p>还有譬如假设误差服从泊松分布，或其他分布那就得用其他分布的概率密度函数去推导出损失函数了。</p>
 <p>所以有时我们也可以把线性回归看成是广义线性回归。比如，逻辑回归，泊松回归都属于广义线性回归的一种，这里我们线性回归可以说是最小二乘线性回归。</p>
-<h3 id="线性回归实战">4、线性回归实战</h3>
-<h4 id="使用正规方程进行求解">4.1、使用正规方程进行求解</h4>
-<h5 id="简单线性回归-1">4.1.1、简单线性回归</h5>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/739367b9a160496c9545b6d3aa157527.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<h3 id="4、线性回归实战">4、线性回归实战</h3>
+<h4 id="4-1、使用正规方程进行求解">4.1、使用正规方程进行求解</h4>
+<h5 id="4-1-1、简单线性回归">4.1.1、简单线性回归</h5>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/739367b9a160496c9545b6d3aa157527.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/739367b9a160496c9545b6d3aa157527.png" alt="image.png"></a></p>
 <p>一元一次方程，在机器学习中一元表示一个特征，b表示截距，y表示目标值。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment"># 转化成矩阵</span></span><br><span class="line">X = np.linspace(<span class="number">0</span>,<span class="number">10</span>,num = <span class="number">30</span>).reshape(-<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 斜率和截距，随机生成</span></span><br><span class="line">w = np.random.randint(<span class="number">1</span>,<span class="number">5</span>,size = <span class="number">1</span>)</span><br><span class="line">b = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 根据一元一次方程计算目标值y，并加上“噪声”，数据有上下波动~</span></span><br><span class="line">y = X * w + b + np.random.randn(<span class="number">30</span>,<span class="number">1</span>)</span><br><span class="line">plt.scatter(X,y)</span><br><span class="line"><span class="comment"># 重新构造X，b截距，相当于系数w0，前面统一乘以1</span></span><br><span class="line">X = np.concatenate([X,np.full(shape = (<span class="number">30</span>,<span class="number">1</span>),fill_value= <span class="number">1</span>)],axis = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 正规方程求解</span></span><br><span class="line">θ = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y).<span class="built_in">round</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;一元一次方程真实的斜率和截距是：&#x27;</span>,w, b)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;通过正规方程求解的斜率和截距是：&#x27;</span>,θ)</span><br><span class="line"><span class="comment"># 根据求解的斜率和截距绘制线性回归线型图</span></span><br><span class="line">plt.plot(X[:,<span class="number">0</span>],X.dot(θ),color = <span class="string">&#x27;green&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <p>效果如下（random.randn是随机生成正太分布数据，所以每次执行图形会有所不同）：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e8786d05d012485ea92c2f26bd67679e.jpg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h5 id="多元线性回归-2">4.1.2、多元线性回归</h5>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/59b917be60864200a61f60b3388cca1d.png" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<p>二元一次方程，<span class="math inline">\(x_1、x_2\)</span>
-相当于两个特征，b是方程截距</p>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e8786d05d012485ea92c2f26bd67679e.jpg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e8786d05d012485ea92c2f26bd67679e.jpg" alt="image.png"></a></p>
+<h5 id="4-1-2、多元线性回归">4.1.2、多元线性回归</h5>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/59b917be60864200a61f60b3388cca1d.png" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/59b917be60864200a61f60b3388cca1d.png" alt="image.png"></a></p>
+<p>二元一次方程，$x_1、x_2$ 相当于两个特征，b是方程截距</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> mpl_toolkits.mplot3d.axes3d <span class="keyword">import</span> Axes3D <span class="comment"># 绘制三维图像</span></span><br><span class="line"><span class="comment"># 转化成矩阵</span></span><br><span class="line">x1 = np.random.randint(-<span class="number">150</span>,<span class="number">150</span>,size = (<span class="number">300</span>,<span class="number">1</span>))</span><br><span class="line">x2 = np.random.randint(<span class="number">0</span>,<span class="number">300</span>,size = (<span class="number">300</span>,<span class="number">1</span>))</span><br><span class="line"><span class="comment"># 斜率和截距，随机生成</span></span><br><span class="line">w = np.random.randint(<span class="number">1</span>,<span class="number">5</span>,size = <span class="number">2</span>)</span><br><span class="line">b = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 根据二元一次方程计算目标值y，并加上“噪声”，数据有上下波动~</span></span><br><span class="line">y = x1 * w[<span class="number">0</span>] + x2 * w[<span class="number">1</span>] + b + np.random.randn(<span class="number">300</span>,<span class="number">1</span>)</span><br><span class="line">fig = plt.figure(figsize=(<span class="number">9</span>,<span class="number">6</span>))</span><br><span class="line">ax = Axes3D(fig)</span><br><span class="line">ax.scatter(x1,x2,y) <span class="comment"># 三维散点图</span></span><br><span class="line">ax.view_init(elev=<span class="number">10</span>, azim=-<span class="number">20</span>) <span class="comment"># 调整视角</span></span><br><span class="line"><span class="comment"># 重新构造X，将x1、x2以及截距b，相当于系数w0，前面统一乘以1进行数据合并</span></span><br><span class="line">X = np.concatenate([x1,x2,np.full(shape = (<span class="number">300</span>,<span class="number">1</span>),fill_value=<span class="number">1</span>)],axis = <span class="number">1</span>)</span><br><span class="line">w = np.concatenate([w,b])</span><br><span class="line"><span class="comment"># 正规方程求解</span></span><br><span class="line">θ = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y).<span class="built_in">round</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;二元一次方程真实的斜率和截距是：&#x27;</span>,w)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;通过正规方程求解的斜率和截距是：&#x27;</span>,θ.reshape(-<span class="number">1</span>))</span><br><span class="line"><span class="comment"># # 根据求解的斜率和截距绘制线性回归线型图</span></span><br><span class="line">x = np.linspace(-<span class="number">150</span>,<span class="number">150</span>,<span class="number">100</span>)</span><br><span class="line">y = np.linspace(<span class="number">0</span>,<span class="number">300</span>,<span class="number">100</span>)</span><br><span class="line">z = x * θ[<span class="number">0</span>] + y * θ[<span class="number">1</span>] + θ[<span class="number">2</span>]</span><br><span class="line">ax.plot(x,y,z ,color = <span class="string">&#x27;red&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <p>效果如下：</p>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b7615df8b1624df78b5168fc58a66475.jpg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h4 id="机器学习库scikit-learn">4.2、机器学习库scikit-learn</h4>
-<h5 id="scikit-learn简介">4.2.1、<a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/index.html">scikit-learn简介</a></h5>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e813979dfefc4f0caaed58f922d6d587.jpeg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h5 id="scikit-learn实现简单线性回归">4.2.2、scikit-learn实现简单线性回归</h5>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b7615df8b1624df78b5168fc58a66475.jpg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/b7615df8b1624df78b5168fc58a66475.jpg" alt="image.png"></a></p>
+<h4 id="4-2、机器学习库scikit-learn">4.2、机器学习库scikit-learn</h4>
+<h5 id="4-2-1、scikit-learn简介">4.2.1、<a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/index.html">scikit-learn简介</a></h5>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e813979dfefc4f0caaed58f922d6d587.jpeg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/e813979dfefc4f0caaed58f922d6d587.jpeg" alt="image.png"></a></p>
+<h5 id="4-2-2、scikit-learn实现简单线性回归">4.2.2、scikit-learn实现简单线性回归</h5>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="comment"># 转化成矩阵</span></span><br><span class="line">X = np.linspace(<span class="number">0</span>,<span class="number">10</span>,num = <span class="number">30</span>).reshape(-<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line"><span class="comment"># 斜率和截距，随机生成</span></span><br><span class="line">w = np.random.randint(<span class="number">1</span>,<span class="number">5</span>,size = <span class="number">1</span>)</span><br><span class="line">b = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 根据一元一次方程计算目标值y，并加上“噪声”，数据有上下波动~</span></span><br><span class="line">y = X * w + b + np.random.randn(<span class="number">30</span>,<span class="number">1</span>)</span><br><span class="line">plt.scatter(X,y)</span><br><span class="line"><span class="comment"># 使用scikit-learn中的线性回归求解</span></span><br><span class="line">model = LinearRegression()</span><br><span class="line">model.fit(X,y)</span><br><span class="line">w_ = model.coef_</span><br><span class="line">b_ = model.intercept_</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;一元一次方程真实的斜率和截距是：&#x27;</span>,w, b)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;通过scikit-learn求解的斜率和截距是：&#x27;</span>,w_,b_)</span><br><span class="line">plt.plot(X,X.dot(w_) + b_,color = <span class="string">&#x27;green&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f06d7439704f4d2a95254d6be0222b36.jpg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
-<h5 id="scikit-learn实现多元线性回归">4.2.3、scikit-learn实现多元线性回归</h5>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f06d7439704f4d2a95254d6be0222b36.jpg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/f06d7439704f4d2a95254d6be0222b36.jpg" alt="image.png"></a></p>
+<h5 id="4-2-3、scikit-learn实现多元线性回归">4.2.3、scikit-learn实现多元线性回归</h5>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> mpl_toolkits.mplot3d.axes3d <span class="keyword">import</span> Axes3D</span><br><span class="line"><span class="comment"># 转化成矩阵</span></span><br><span class="line">x1 = np.random.randint(-<span class="number">150</span>,<span class="number">150</span>,size = (<span class="number">300</span>,<span class="number">1</span>))</span><br><span class="line">x2 = np.random.randint(<span class="number">0</span>,<span class="number">300</span>,size = (<span class="number">300</span>,<span class="number">1</span>))</span><br><span class="line"><span class="comment"># 斜率和截距，随机生成</span></span><br><span class="line">w = np.random.randint(<span class="number">1</span>,<span class="number">5</span>,size = <span class="number">2</span>)</span><br><span class="line">b = np.random.randint(<span class="number">1</span>,<span class="number">10</span>,size = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 根据二元一次方程计算目标值y，并加上“噪声”，数据有上下波动~</span></span><br><span class="line">y = x1 * w[<span class="number">0</span>] + x2 * w[<span class="number">1</span>] + b + np.random.randn(<span class="number">300</span>,<span class="number">1</span>)</span><br><span class="line">fig = plt.figure(figsize=(<span class="number">9</span>,<span class="number">6</span>))</span><br><span class="line">ax = Axes3D(fig)</span><br><span class="line">ax.scatter(x1,x2,y) <span class="comment"># 三维散点图</span></span><br><span class="line">ax.view_init(elev=<span class="number">10</span>, azim=-<span class="number">20</span>) <span class="comment"># 调整视角</span></span><br><span class="line"><span class="comment"># 重新构造X，将x1、x2以及截距b，相当于系数w0，前面统一乘以1进行数据合并</span></span><br><span class="line">X = np.concatenate([x1,x2],axis = <span class="number">1</span>)</span><br><span class="line"><span class="comment"># 使用scikit-learn中的线性回归求解</span></span><br><span class="line">model = LinearRegression()</span><br><span class="line">model.fit(X,y)</span><br><span class="line">w_ = model.coef_.reshape(-<span class="number">1</span>)</span><br><span class="line">b_ = model.intercept_</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;二元一次方程真实的斜率和截距是：&#x27;</span>,w,b)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;通过scikit-learn求解的斜率和截距是：&#x27;</span>,w_,b_)</span><br><span class="line"><span class="comment"># # 根据求解的斜率和截距绘制线性回归线型图</span></span><br><span class="line">x = np.linspace(-<span class="number">150</span>,<span class="number">150</span>,<span class="number">100</span>)</span><br><span class="line">y = np.linspace(<span class="number">0</span>,<span class="number">300</span>,<span class="number">100</span>)</span><br><span class="line">z = x * w_[<span class="number">0</span>] + y * w_[<span class="number">1</span>] + b_</span><br><span class="line">ax.plot(x,y,z ,color = <span class="string">&#x27;green&#x27;</span>)</span><br></pre></td></tr></table></figure>
-<figure>
-<img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/0066efeb6e5e4bfbaba999022d3009bd.jpg" alt="image.png">
-<figcaption aria-hidden="true">image.png</figcaption>
-</figure>
+<p><a target="_blank" rel="noopener" href="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/0066efeb6e5e4bfbaba999022d3009bd.jpg" title="image.png" class="gallery-item" style="box-shadow: none;"> <img src="https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/463/1651232743056/0066efeb6e5e4bfbaba999022d3009bd.jpg" alt="image.png"></a></p>
 </div>
     </div>
 
